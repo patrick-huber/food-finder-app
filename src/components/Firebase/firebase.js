@@ -1,6 +1,7 @@
 import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/analytics';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -9,6 +10,8 @@ const config = {
   projectId: process.env.REACT_APP_PROJECT_ID,
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 
 class Firebase {
@@ -24,6 +27,8 @@ class Firebase {
 
     this.auth = app.auth();
     this.db = app.firestore();
+    this.firestore = app.firestore;
+    this.analytics = app.analytics();
 
     /* Social Sign In Method Provider */
 
@@ -103,6 +108,12 @@ class Firebase {
   vendor = uid => this.db.doc(`vendors/${uid}`);
 
   vendors = () => this.db.collection('vendors');
+
+  // *** Calendar API ***
+
+  calendarDetails = uid => this.db.doc(`calendar/${uid}`);
+
+  calendar = () => this.db.collection('calendar');
 
   // *** Message API ***
 

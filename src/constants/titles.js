@@ -1,5 +1,5 @@
-export const LANDING = '/';
-export const ABOUT = '/about';
+export const LANDING = 'Fair Food Finder';
+export const ABOUT = 'About | Fair Food Finder';
 export const SIGN_UP = '/signup';
 export const SIGN_IN = '/signin';
 export const HOME = '/home';

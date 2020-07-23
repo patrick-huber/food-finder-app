@@ -1,11 +1,13 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { BrowserRouter as Router, Link } from 'react-router-dom';
 
 import { AuthUserContext } from '../Session';
 import SignOutButton from '../SignOut';
 import * as ROUTES from '../../constants/routes';
 import * as ROLES from '../../constants/roles';
+
+import FoodFinderLogo from '../SVG/food-finder-logo.svg';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -18,11 +20,13 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+
+import CloseIcon from '@material-ui/icons/Close';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-
-const drawerWidth = 240;
+import RoomIcon from '@material-ui/icons/Room';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,24 +37,26 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    backgroundColor: 'rgba(235, 245, 254, 1)',
+    boxShadow: 'none',
   },
-  appBarSpacer: theme.mixins.toolbar,
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+  title: {
+    margin: '0 auto',
+    '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
+    filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    left: theme.spacing(2),
+    position: 'absolute',
+    color: '#2699FB',
+    '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
+    filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
   hide: {
     display: 'none',
   },
   list: {
-    width: 250,
+    width: '100vw',
   },
   fullList: {
     width: 'auto',
@@ -62,7 +68,6 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth,
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -96,37 +101,90 @@ export default function Header() {
       </AuthUserContext.Consumer>
   );
 
-  const NavigationAuth = ({ authUser }) => (  
-    <ul>
-      <li>
-        <Link to={ROUTES.LANDING}>Landing</Link>
-      </li>
-      <li>
-        <Link to={ROUTES.HOME}>Home</Link>
-      </li>
-      <li>
-        <Link to={ROUTES.ACCOUNT}>Account</Link>
-      </li>
-      {!!authUser.roles[ROLES.ADMIN] && (
-        <li>
-          <Link to={ROUTES.ADMIN}>Admin</Link>
-        </li>
-      )}
-      <li>
-        <SignOutButton />
-      </li>
-    </ul>
+  const NavigationAuth = ({ authUser }) => ( 
+    <div> 
+      <List component="nav" aria-label="Primary nav">
+        <Link to={ROUTES.LANDING}>
+          <ListItem
+            button
+            selected
+          >
+            <ListItemIcon>
+              <RoomIcon />
+            </ListItemIcon>
+            <ListItemText primary="Food Finder Map" />
+          </ListItem>
+        </Link>
+        <Link to={ROUTES.HOME}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItem>
+        </Link>
+        <Link to={ROUTES.ACCOUNT}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="Account" />
+          </ListItem>
+        </Link>
+        {!!authUser.roles[ROLES.ADMIN] && (
+        <Link to={ROUTES.ADMIN}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="Admin" />
+          </ListItem>
+        </Link>
+        )}
+        <Link to={ROUTES.ACCOUNT}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <SignOutButton />
+          </ListItem>
+        </Link>
+      </List>
+    </div>
   );
 
   const NavigationNonAuth = () => (
-    <ul>
-      <li>
-        <Link to={ROUTES.LANDING}>Landing</Link>
-      </li>
-      <li>
-        <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-      </li>
-    </ul>
+    <div>
+      <List component="nav" aria-label="Primary nav">
+        <Link to={ROUTES.LANDING}>
+          <ListItem
+            button
+            selected
+          >
+            <ListItemIcon>
+              <RoomIcon />
+            </ListItemIcon>
+            <ListItemText primary="Food Finder Map" />
+          </ListItem>
+        </Link>
+        <Link to={ROUTES.ABOUT}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="About" />
+          </ListItem>
+        </Link>
+        <Link to={ROUTES.SIGN_IN}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="Sign In" />
+          </ListItem>
+        </Link>
+      </List>
+    </div>
   );
 
   return (
@@ -146,12 +204,15 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Food Finder
-          </Typography>
+          <img className={clsx(classes.title)} src={FoodFinderLogo} alt="Fair Food Finder" />
         </Toolbar>
       </AppBar>
       <Drawer open={open}>
+        <Toolbar>
+          <IconButton edge="start" color="inherit" onClick={() => setOpen(false)} aria-label="close">
+            <CloseIcon />
+          </IconButton>
+        </Toolbar>
         <div
           className={clsx(classes.list)}
           role="presentation"
@@ -161,7 +222,6 @@ export default function Header() {
         <Navigation />
         </div>
       </Drawer>
-      <div className={classes.appBarSpacer} />
     </div>
   );
 }

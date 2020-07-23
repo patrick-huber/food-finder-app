@@ -5,11 +5,18 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "firebase": "^5.11.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
+    "@material-ui/pickers": "^4.0.0-alpha.9",
+    "@material-ui/styles": "^4.10.0",
+    "@react-google-maps/api": "^1.9.7",
+    "autosuggest-highlight": "^3.1.1",
+    "date-fns": "^2.14.0",
+    "firebase": "^7.16.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-router-dom": "^4.3.1",
-    "react-scripts": "3.1.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "react-spinners": "^0.9.0",
     "recompose": "^0.30.0"
   },
   "scripts": {
@@ -23,5 +30,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@svgr/webpack": "^5.4.0"
+  }
 }

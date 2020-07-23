@@ -11,3 +11,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.text-open {
+  color: green;
+}
+.text-closed {
+  color: red;
+}
+
+.gm-style-iw {
+  max-width: 90vw !important;
+}
+.gm-style-iw-d {
+  overflow-x: hidden !important;
+}
