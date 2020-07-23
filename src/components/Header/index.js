@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: 'rgba(235, 245, 254, 1)',
+    backgroundColor: 'rgba(235, 245, 254, .9)',
     boxShadow: 'none',
   },
   title: {
@@ -55,27 +55,17 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: 'none',
   },
+  drawer: {
+    '& .MuiDrawer-paper': {
+      backgroundColor: 'rgba(235, 245, 254, 0.95)',  
+    }
+  },
   list: {
     width: '100vw',
   },
-  fullList: {
-    width: 'auto',
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
+  mapIcon: {
+    color: theme.palette.secondary.main,
+  }
 }));
 
 export default function Header() {
@@ -162,7 +152,7 @@ export default function Header() {
             selected
           >
             <ListItemIcon>
-              <RoomIcon />
+              <RoomIcon className={clsx(classes.mapIcon)} />
             </ListItemIcon>
             <ListItemText primary="Food Finder Map" />
           </ListItem>
@@ -207,7 +197,7 @@ export default function Header() {
           <img className={clsx(classes.title)} src={FoodFinderLogo} alt="Fair Food Finder" />
         </Toolbar>
       </AppBar>
-      <Drawer open={open}>
+      <Drawer className={clsx(classes.drawer)} open={open}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={() => setOpen(false)} aria-label="close">
             <CloseIcon />
@@ -219,7 +209,7 @@ export default function Header() {
           onClick={handleDrawerClose}
           onKeyDown={handleDrawerClose}
         >
-        <Navigation />
+          <Navigation />
         </div>
       </Drawer>
     </div>
