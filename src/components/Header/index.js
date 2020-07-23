@@ -165,12 +165,20 @@ export default function Header() {
             <ListItemText primary="About" />
           </ListItem>
         </Link>
-        <Link to={ROUTES.SIGN_IN}>
+        <Link to={ROUTES.VENDORS}>
           <ListItem
             button
           >
             <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Sign In" />
+            <ListItemText primary="Vendors" />
+          </ListItem>
+        </Link>
+        <Link to={ROUTES.SUPPORT}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="Support & Contact" />
           </ListItem>
         </Link>
       </List>

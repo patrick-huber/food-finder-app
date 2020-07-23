@@ -9,6 +9,8 @@ import Page from '../PageView';
 import Header from '../Header';
 import LandingPage from '../Landing';
 import AboutPage from '../About';
+import { VendorPage } from '../Vendors';
+import SupportPage from '../Support';
 import SignUpPage from '../SignUp';
 import SignInPage from '../SignIn';
 import PasswordForgetPage from '../PasswordForget';
@@ -24,6 +26,7 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       main: '#2699FB',
+      contrastText: '#fff',
     },
   },
 });
@@ -34,6 +37,15 @@ function App (props) {
       <ThemeProvider theme={theme}>
         <Header />
         <Route
+          exact
+          path={ROUTES.LANDING}
+          render={() => (
+            <Page title={ROUTE_TITLES.LANDING} firebase={props.firebase} >
+              <LandingPage />
+            </Page>
+          )}
+        />
+        <Route
           path={ROUTES.ABOUT}
           render={() => (
             <Page title={ROUTE_TITLES.ABOUT} firebase={props.firebase} >
@@ -42,11 +54,18 @@ function App (props) {
           )}
         />
         <Route
-          exact
-          path={ROUTES.LANDING}
+          path={ROUTES.VENDORS}
           render={() => (
-            <Page title={ROUTE_TITLES.LANDING} firebase={props.firebase} >
-              <LandingPage />
+            <Page title={ROUTE_TITLES.VENDORS} firebase={props.firebase} >
+              <VendorPage />
+            </Page>
+          )}
+        />
+        <Route
+          path={ROUTES.SUPPORT}
+          render={() => (
+            <Page title={ROUTE_TITLES.SUPPORT} firebase={props.firebase} >
+              <SupportPage />
             </Page>
           )}
         />

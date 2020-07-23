@@ -1,5 +1,7 @@
 export const LANDING = '/';
 export const ABOUT = '/about';
+export const VENDORS = '/vendors';
+export const SUPPORT = '/support';
 export const SIGN_UP = '/signup';
 export const SIGN_IN = '/signin';
 export const HOME = '/home';
