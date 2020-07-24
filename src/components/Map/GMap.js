@@ -469,11 +469,7 @@ class GMap extends Component {
   isOpen = (event) => {
     let now = new Date();
 
-    if(event.recurring_start) {
-      return event.days.includes(now.getDay());
-    } else {
-      return (now < event.end_time.toDate() && now > event.start_time.toDate());
-    }
+    return (now < event.end_time.toDate() && now > event.start_time.toDate());
   }
 
   setNewBounds = (markers, padding) => {
