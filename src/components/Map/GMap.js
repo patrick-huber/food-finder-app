@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { areIntervalsOverlapping, isWithinInterval } from 'date-fns'
+
 import { styled } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
@@ -125,13 +127,12 @@ function getDayString(dayValue) {
 
   return weekday[dayValue];
 }
-function getNextDate(recurringEvent, props) {
-  // Determines the next date of a recurring event after the current date and time
+function getNextDate(recurringEvent, firebase, fromDate) {
+  // Determines the next date of a recurring event after the current date or param fromDate
   // Adds plain text days string (daysString) to returned object
   let recurringEventDays = '';
   let firstDay = true;
-
-  const today = new Date();
+  const today = fromDate || new Date();
   const todayDay = today.getDay();
   const startDate = recurringEvent.start_time.toDate();
   const startHour = startDate.getHours();
@@ -139,8 +140,8 @@ function getNextDate(recurringEvent, props) {
   const endDate = recurringEvent.end_time.toDate();
   const endHour = endDate.getHours();
   const endMinutes = endDate.getMinutes();
-  let newStart = new Date();
-  let newEnd = new Date();
+  let newStart = new Date(today);
+  let newEnd = new Date(today);
   let checkDay = todayDay;
   let dateSet = false;
 
@@ -168,10 +169,10 @@ function getNextDate(recurringEvent, props) {
 
   newStart.setHours(startHour);
   newStart.setMinutes(startMinutes);
-  recurringEvent.start_time = new props.firebase.firestore.Timestamp.fromDate(newStart);
+  recurringEvent.start_time = new firebase.firestore.Timestamp.fromDate(newStart);
   newEnd.setHours(endHour);
   newEnd.setMinutes(endMinutes);
-  recurringEvent.end_time = new props.firebase.firestore.Timestamp.fromDate(newEnd);
+  recurringEvent.end_time = new firebase.firestore.Timestamp.fromDate(newEnd);
 
   // Create plain text recurring days string
   recurringEvent.days.map(day => {
@@ -367,28 +368,31 @@ class GMap extends Component {
     if(dates[0]) {
       let i = 0;
       const startDateFilter = new Date(dates[0].getTime());
-      const endDateFilter = (!dates[1]) ? startDateFilter : new Date(dates[1].getTime());
+      const endDateFilter = (!dates[1]) ? startDateFilter.addDays(1) : new Date(dates[1].getTime());
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
 
       for (i; i < currentCalendar.length; i++) {
         if(currentCalendar[i].recurring_start) {
-          // Check if some of event days are within filter range
-          if(
-            ((currentCalendar[i].recurring_start.toDate() >= startDateFilter) && (currentCalendar[i].recurring_start.toDate() <= endDateFilter)) ||
-            ((currentCalendar[i].recurring_end.toDate() >=startDateFilter) && (currentCalendar[i].recurring_end.toDate() <= endDateFilter))) {
-              // Filter recurring events by the days of the week selected in the date filter
-              let r = 0;
-              
-              for (r; r < currentCalendar[i].days.length; r++) {
-                if(filterDays.includes(currentCalendar[i].days[r])) {
-                  dateResults.push(currentCalendar[i]);
-                  r = currentCalendar[i].days.length;
-                } 
-              }
-          }
-        } else {
-           if(startDateFilter <= currentCalendar[i].end_time.toDate() && endDateFilter >= currentCalendar[i].start_time.toDate().addDays(-1)) {
-            dateResults.push(currentCalendar[i]);
+          // Check if dates overlap
+          const overlapDates = areIntervalsOverlapping(
+              { start: currentCalendar[i].recurring_start.toDate(), end: currentCalendar[i].recurring_end.toDate() },
+              { start: startDateFilter, end: endDateFilter }
+            );
+
+          if(overlapDates) {
+            // Get next future date of recurring event starting at startDateFilter
+            const nextDateAfterStartFilter = getNextDate(currentCalendar[i], this.props.firebase, startDateFilter)
+
+            // Check if next recurring event date is within filter dates
+            const nextDateOverlap = isWithinInterval(
+              nextDateAfterStartFilter.start_time.toDate(),
+              { start: startDateFilter, end: endDateFilter }
+            );
+
+            if(nextDateOverlap) {
+              // event is within date range. Push to result
+              dateResults.push(currentCalendar[i]);
+            }
           }
         }
       }
@@ -504,7 +508,7 @@ class GMap extends Component {
           if(vendorEvents[0].recurring_start) {
             // If next event is recurring then we need to calculate updated start_time for all recurring events to display correct order by date
             for (var i = vendorEvents.length - 1; i >= 0; i--) {
-              if(vendorEvents[i].recurring_start) vendorEvents[i] = getNextDate(vendorEvents[i], this.props);
+              if(vendorEvents[i].recurring_start) vendorEvents[i] = getNextDate(vendorEvents[i], this.props.firebase);
             }
             vendorEvents.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
           }
