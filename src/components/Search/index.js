@@ -12,12 +12,18 @@ import ListItemText from '@material-ui/core/ListItemText';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 
+const SearchAutocomplete = withStyles({
+  root: {
+    '& .MuiFormControl-root': {
+      margin: 0,
+    }
+  },
+})(Autocomplete);
 const ResultsContainer = withStyles({
   root: {
     padding: 0,
     zIndex: 0,
   },
-  disableGutters: true,
 })(Container);
 const ListboxContainer = withStyles({
   root: {
@@ -43,7 +49,8 @@ export default function VendorSearch(props) {
   }
 
   return (
-    <Autocomplete
+    <SearchAutocomplete
+    disableGutters
       id="search"
       PopperComponent={ResultsContainer}
       PaperComponent={ResultsContainer}
