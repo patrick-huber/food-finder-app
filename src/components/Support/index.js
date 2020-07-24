@@ -19,9 +19,7 @@ import PhoneIcon from '@material-ui/icons/Phone';
 import LanguageIcon from '@material-ui/icons/Language';
 
 const useStyles = makeStyles((theme) => ({
-  icon: {
-    marginRight: theme.spacing(2),
-  },
+  appBarSpacer: theme.mixins.toolbar,
   heroContent: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(8, 0, 6),
@@ -52,6 +50,7 @@ export default function Support() {
   return (
     <React.Fragment>
       <CssBaseline />
+      <div className={classes.appBarSpacer} />
       <main>
         {/* Hero unit */}
         <div className={classes.heroContent}>
@@ -85,7 +84,7 @@ export default function Support() {
               <Typography component="h2" variant="h3" align="center" color="textPrimary" gutterBottom>
                 Contact
               </Typography>
-              <Typography component="p" variant="p" gutterBottom>
+              <Typography component="p" gutterBottom>
                 If you would like to contact the team behind the Fair Food Finder app (currently a team of 1) please send a note.
               </Typography>
               <List

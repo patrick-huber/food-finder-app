@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { BrowserRouter as Router, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { AuthUserContext } from '../Session';
 import SignOutButton from '../SignOut';
@@ -14,12 +14,9 @@ import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import CloseIcon from '@material-ui/icons/Close';
 import List from '@material-ui/core/List';
@@ -27,6 +24,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import RoomIcon from '@material-ui/icons/Room';
+import ReportProblemIcon from '@material-ui/icons/ReportProblem';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,6 +61,10 @@ const useStyles = makeStyles((theme) => ({
   list: {
     width: '100vw',
   },
+  menuLink : {
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+  },
   mapIcon: {
     color: theme.palette.secondary.main,
   }
@@ -93,7 +95,7 @@ export default function Header() {
 
   const NavigationAuth = ({ authUser }) => ( 
     <div> 
-      <List component="nav" aria-label="Primary nav">
+      <List className={clsx(classes.menuList)} component="nav" aria-label="Primary nav">
         <Link to={ROUTES.LANDING}>
           <ListItem
             button
@@ -146,7 +148,7 @@ export default function Header() {
   const NavigationNonAuth = () => (
     <div>
       <List component="nav" aria-label="Primary nav">
-        <Link to={ROUTES.LANDING}>
+        <Link className={clsx(classes.menuLink)} to={ROUTES.LANDING}>
           <ListItem
             button
             selected
@@ -157,30 +159,30 @@ export default function Header() {
             <ListItemText primary="Food Finder Map" />
           </ListItem>
         </Link>
-        <Link to={ROUTES.ABOUT}>
+        <Link className={clsx(classes.menuLink)} to={ROUTES.VENDORS}>
           <ListItem
             button
           >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="About" />
+            <ListItemText inset primary="Vendors" />
           </ListItem>
         </Link>
-        <Link to={ROUTES.VENDORS}>
+        <Link className={clsx(classes.menuLink)} to={ROUTES.SUPPORT}>
           <ListItem
             button
           >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Vendors" />
+            <ListItemText inset primary="Support & Contact" />
           </ListItem>
         </Link>
-        <Link to={ROUTES.SUPPORT}>
-          <ListItem
-            button
-          >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Support & Contact" />
-          </ListItem>
-        </Link>
+        <Divider />
+        <ListItem
+          button
+          onClick={() => window.open('https://forms.gle/14XSLARoKh9CBYB8A')}
+        >
+          <ListItemIcon>
+            <ReportProblemIcon />
+          </ListItemIcon>
+          <ListItemText primary="Report Bad Info" />
+        </ListItem>
       </List>
     </div>
   );
