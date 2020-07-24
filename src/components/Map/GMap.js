@@ -750,7 +750,6 @@ class GMap extends Component {
               open={modalOpen}
               onClose={this.onModalClose}
               aria-labelledby="modal-search-title"
-              aria-describedby="modal-search-description"
               TransitionComponent={Transition}
             >
               <DialogToolbar>
@@ -769,9 +768,6 @@ class GMap extends Component {
                 : (
                   <DialogContainer>
                     <FormControl fullWidth>
-                      <p id="modal-search-description">
-                        Search for a vendor by name
-                      </p>
                       <Search
                         options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
                     </FormControl>

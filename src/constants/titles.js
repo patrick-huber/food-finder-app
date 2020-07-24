@@ -1,5 +1,7 @@
 export const LANDING = 'Fair Food Finder';
 export const ABOUT = 'About | Fair Food Finder';
+export const VENDORS = 'Vendors | Get listed on the Fair Food Finder';
+export const SUPPORT = 'Support & Contact | Fair Food Finder';
 export const SIGN_UP = '/signup';
 export const SIGN_IN = '/signin';
 export const HOME = '/home';
