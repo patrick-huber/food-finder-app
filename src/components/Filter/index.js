@@ -54,7 +54,7 @@ const ActionsBar =  withStyles({
   root: {
     top: 'auto',
     bottom: 0,
-    padding: '10px 30px',
+    padding: '0 30px',
     backgroundColor: '#ffffff',
   }
 })(AppBar);

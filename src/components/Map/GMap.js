@@ -82,7 +82,7 @@ const DialogToolbar = styled(Toolbar)({
 const ActionsBar = styled(AppBar)({
   top: 'auto',
   bottom: 0,
-  padding: '10px 30px',
+  padding: '0 30px',
   backgroundColor: '#ffffff',
 });
 const Actions = styled(Button)({
