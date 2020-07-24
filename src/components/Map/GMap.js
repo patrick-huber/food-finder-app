@@ -4,8 +4,6 @@ import { styled } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
 
-import Popover from '@material-ui/core/Popover';
-
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
@@ -149,7 +147,7 @@ function getNextDate(recurringEvent, props) {
   // Set start_time and end_time of next recurring event (closest to today)
   // Go through event days array starting at index of todayDay
   do {
-    let eventDay = (recurringEvent.days.indexOf(checkDay) != -1) ? recurringEvent.days[recurringEvent.days.indexOf(checkDay)] : null;
+    let eventDay = (recurringEvent.days.indexOf(checkDay) !== -1) ? recurringEvent.days[recurringEvent.days.indexOf(checkDay)] : null;
 
     if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
       // Happening today and hasn't ended yet - keep newStart and newEnd value of today
@@ -217,10 +215,6 @@ const mapOptions = {
 }
 
 const timeNow = new Date();
-const calendarDefaults = {
-  startTime: timeNow,
-  endTime: timeNow.addDays(7),
-}
 
 class GMap extends Component {
   constructor(props) {
@@ -241,7 +235,6 @@ class GMap extends Component {
       filteredDates: [null,null],
       vendors: [],
       vendorFilteredCalendar: [],
-      searchResults: [],
       locationLoading: false,
       infoLoading: false,
       infoData: {},
@@ -301,7 +294,6 @@ class GMap extends Component {
       modalLoaded: false,
       vendors: [],
       vendorFilteredCalendar: [],
-      searchResults: [],
       infoLoading: false,
       infoData: {},
       selected: null,
@@ -664,10 +656,8 @@ class GMap extends Component {
   render() {
     const {
       calendar,
-      fullCalendar,
       refresh,
       modalLoading,
-      modalLoaded,
       modalOpen,
       filterModalOpen,
       filteredHoursToggle,
@@ -675,8 +665,6 @@ class GMap extends Component {
       filteredDates,
       filterSet,
       vendors,
-      searchResults,
-      loading,
       locationLoading,
       infoLoading,
       infoData,

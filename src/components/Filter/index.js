@@ -1,9 +1,6 @@
-/* eslint-disable no-use-before-define */
 import React from 'react';
 
-import PropTypes from 'prop-types';
-
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 // @material-ui/pickers
 import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
@@ -19,7 +16,6 @@ import DoneIcon from '@material-ui/icons/Done';
 import Typography from '@material-ui/core/Typography';
 
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';

@@ -9,7 +9,6 @@ import { CalendarList } from '../Calendar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 
 import List from '@material-ui/core/List';
@@ -76,7 +75,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function InfoWindow(props) {
   const observed = useRef(null);
-  const [infoData, setInfoData] = useState(props.infoData);
+  const infoData = props.infoData;
   const [modalOpen, setModalOpen] = useState(false);
   const firebase = props.firebase;
 
@@ -222,7 +221,7 @@ export default function InfoWindow(props) {
         {(infoData.photo || infoData.instagram || infoData.facebook) &&
           <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
             {infoData.photo &&
-              <img src={infoData.photo} style={{width:'100%'}} />
+              <img src={infoData.photo} alt="Vendor" style={{width:'100%'}} />
             }
             <Grid container justify="space-evenly" spacing={1}>
               {infoData.instagram &&
