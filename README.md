@@ -1,4 +1,8 @@
-# react-firestore-authentication
+# Fair Food Finder
+## Based on react-firestore-authentication
+
+--
+## react-firestore-authentication original documentation below
 
 [![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-firestore-authentication.svg)](https://greenkeeper.io/)
 
