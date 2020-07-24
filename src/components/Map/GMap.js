@@ -838,7 +838,7 @@ class GMap extends Component {
           </Grid>
           <Snackbar
             anchorOrigin={{
-              vertical: 'bottom',
+              vertical: 'top',
               horizontal: 'center',
             }}
             open={refresh}
