@@ -31,7 +31,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
 
-import { Spinner } from '../Loading';
+import { Spinner, Fullscreen } from '../Loading';
 
 import { withFirebase } from '../Firebase';
 
@@ -254,12 +254,17 @@ class GMap extends Component {
       .onSnapshot(snapshot => {
         let calendar = [];
 
-        snapshot.forEach(event =>{
+        snapshot.forEach(event => {
           const eventData = event.data();
 
           if(eventData.recurring_start) {
             if(eventData.recurring_end.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
           } else if(eventData.end_time.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
+        }, err => {
+          alert('Unable to load map. Please try again later.')
+          this.setState({
+            loading: false,
+          });
         });
 
         if(this.state.loading) {
@@ -655,6 +660,7 @@ class GMap extends Component {
 
   render() {
     const {
+      loading,
       calendar,
       refresh,
       modalLoading,
@@ -675,6 +681,9 @@ class GMap extends Component {
 
     return (
       <div>
+        {loading &&
+          <Fullscreen />
+        }
         <LoadScript
           googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
         >
