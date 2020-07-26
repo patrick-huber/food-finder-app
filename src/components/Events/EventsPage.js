@@ -6,7 +6,7 @@ import * as ROLES from '../../constants/roles';
 import * as ROUTES from '../../constants/routes';
 
 import { withAuthorization, withEmailVerification } from '../Session';
-import { EventList, EventEdit } from '../Events';
+import { EventList, EventView, EventEdit } from '../Events';
 
 import Footer from '../Footer';
 
@@ -63,7 +63,7 @@ function EventsPage(props) {
           <Paper elevation={0} spacing={2} className={classes.paperCallout}>
             <Switch>
               <Route exact path={ROUTES.EVENTS} component={EventList} />
-              <Route exact path={ROUTES.EVENT_VIEW} component={EventEdit} />
+              <Route exact path={ROUTES.EVENT_VIEW} component={EventView} />
               <Route exact path={ROUTES.EVENT_EDIT} component={EventEdit} />
             </Switch>
           </Paper>
