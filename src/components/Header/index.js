@@ -111,7 +111,7 @@ export default function Header() {
             button
           >
             <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Home" />
+            <ListItemText primary="View Events" />
           </ListItem>
         </Link>
         <Link to={ROUTES.ACCOUNT}>
@@ -119,7 +119,7 @@ export default function Header() {
             button
           >
             <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Account" />
+            <ListItemText primary="Edit Profile" />
           </ListItem>
         </Link>
         {!!authUser.roles[ROLES.ADMIN] && (
@@ -182,6 +182,15 @@ export default function Header() {
           </ListItemIcon>
           <ListItemText primary="Report Bad Info" />
         </ListItem>
+        <Divider />
+
+        <Link className={clsx(classes.menuLink)} to={ROUTES.SIGN_IN}>
+          <ListItem
+            button
+          >
+            <ListItemText inset primary="Vendor Sign In" />
+          </ListItem>
+        </Link>
       </List>
     </div>
   );
