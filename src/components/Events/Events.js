@@ -51,10 +51,6 @@ class Events extends Component {
     this.unsubscribe();
   }
 
-  onEditEvent = () => {
-    // Todo: route to edit event page
-  };
-
   render() {
     const { text, events, loading } = this.state;
 
@@ -67,7 +63,6 @@ class Events extends Component {
           <EventList
             authUser={this.props.authUser}
             events={events}
-            onEditEvent={this.onEditEvent}
           />
         }
         {!events && <div>There are no events ...</div>}

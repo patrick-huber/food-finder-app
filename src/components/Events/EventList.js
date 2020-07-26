@@ -5,7 +5,6 @@ import EventItem from './EventItem';
 const EventList = ({
   authUser,
   events,
-  onEditEvent,
 }) => (
   <ul>
     {events && events.map(event => (
@@ -13,7 +12,6 @@ const EventList = ({
         authUser={authUser}
         key={event.uid}
         event={event}
-        onEditEvent={onEditEvent}
       />
     ))}
   </ul>

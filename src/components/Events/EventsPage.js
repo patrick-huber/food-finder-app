@@ -1,8 +1,12 @@
 import React from 'react';
+import { Switch, Route } from 'react-router-dom';
 import { compose } from 'recompose';
 
+import * as ROLES from '../../constants/roles';
+import * as ROUTES from '../../constants/routes';
+
 import { withAuthorization, withEmailVerification } from '../Session';
-import { EventList } from '../Events';
+import { EventList, EventEdit } from '../Events';
 
 import Footer from '../Footer';
 
@@ -44,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function HomePage(props) {
+function EventsPage(props) {
   const classes = useStyles();
 
   return (
@@ -54,28 +58,14 @@ function HomePage(props) {
       <main>
         <Container className={classes.section} maxWidth="sm">
           <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-            Vendor Portal
-          </Typography>
-          <Typography variant="h5" align="center" color="textSecondary" paragraph>
-            Manage your events on the Fair Food Finder
-          </Typography>
-          <div className={classes.buttonGroup}>
-            <Grid container spacing={2} justify="center">
-              <Grid item>
-                <Button variant="contained" color="primary" onClick={() => {}}>
-                  Add New Event
-                </Button>
-              </Grid>
-            </Grid>
-          </div>
-        </Container>
-        <Divider />
-        <Container className={classes.section} maxWidth="sm">
-          <Typography component="h2" variant="h4" align="center" color="textPrimary" gutterBottom>
-            Your Events
+            Events
           </Typography>
           <Paper elevation={0} spacing={2} className={classes.paperCallout}>
-            <EventList />
+            <Switch>
+              <Route exact path={ROUTES.EVENTS} component={EventList} />
+              <Route exact path={ROUTES.EVENT_VIEW} component={EventEdit} />
+              <Route exact path={ROUTES.EVENT_EDIT} component={EventEdit} />
+            </Switch>
           </Paper>
         </Container>
       </main>
@@ -89,4 +79,4 @@ const condition = authUser => !!authUser;
 export default compose(
   withEmailVerification,
   withAuthorization(condition),
-)(HomePage);
+)(EventsPage);

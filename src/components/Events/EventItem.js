@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import * as ROUTES from '../../constants/routes';
 
 class EventItem extends Component {
   constructor(props) {
@@ -13,9 +15,14 @@ class EventItem extends Component {
         <span>
           <strong>{event.vendor}</strong> {event.address}
         </span>
-        <span>
-          <button onClick={this.onToggleEditMode}>Edit</button>
-        </span>
+        <Link
+          to={{
+            pathname: `${ROUTES.EVENTS}/edit/${event.uid}`,
+            state: { event },
+          }}
+        >
+          Edit
+        </Link>
       </li>
     );
   }

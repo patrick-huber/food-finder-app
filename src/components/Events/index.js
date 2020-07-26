@@ -1,3 +1,5 @@
-import Events from './Events';
+import EventsPage from './EventsPage';
+import EventList from './Events';
+import EventEdit from './Edit';
 
-export default Events;
+export { EventsPage, EventList, EventEdit };

@@ -9,6 +9,7 @@ import Header from '../Header';
 import LandingPage from '../Landing';
 import AboutPage from '../About';
 import { VendorPage } from '../Vendors';
+import { EventsPage } from '../Events';
 import SupportPage from '../Support';
 import SignUpPage from '../SignUp';
 import SignInPage from '../SignIn';
@@ -69,6 +70,14 @@ function App (props) {
           render={() => (
             <Page title={ROUTE_TITLES.SUPPORT} firebase={props.firebase} >
               <SupportPage />
+            </Page>
+          )}
+        />
+        <Route
+          path={ROUTES.EVENTS}
+          render={() => (
+            <Page title={ROUTE_TITLES.EVENTS} firebase={props.firebase} >
+              <EventsPage />
             </Page>
           )}
         />
