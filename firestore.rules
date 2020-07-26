@@ -1,8 +1,46 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read;
+
+    // Custom functions
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+      'ADMIN'in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.values();
+    }
+
+    function isCalendarOwner() {
+      return signedIn() && request.auth.vendor == resource.data.vendor;
+    }
+
+    function isVendorOwner() {
+      return signedIn() && request.auth.vendor == resource.id;
+    }
+
+    function isSelf() {
+      return signedIn() && request.auth.uid == resource.id;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow list: if isAdmin();
+      allow get, update, delete: if isSelf() || isAdmin();
+      allow create: if signedIn();
+    }
+
+    match /vendors/{vendorId} {
+      allow get, list;
+      allow create, delete: if isAdmin();
+      allow update: if isVendorOwner();
+    }
+
+    match /calendar/{eventId} {
+      allow get, list;
+      allow create: if isAdmin() || signedIn() && request.resource.data.vendor == request.auth.vendor;
+      allow update, delete: if isAdmin() || isCalendarOwner();
     }
   }
 }
