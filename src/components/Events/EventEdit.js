@@ -157,7 +157,7 @@ class EventEdit extends Component {
 
   handleNotesChange = (value) => {
     let newFormData = this.state.formData;
-    newFormData['notes'] = value;
+    newFormData['notes'] = value.target.value;
 
     this.setState( {
       formData: newFormData,
@@ -300,9 +300,7 @@ class EventEdit extends Component {
                     </Grid>
                   }
                   <Grid item xs={12} sm={12}>
-                    <form noValidate autoComplete="off">
-                      <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
-                    </form>
+                    <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
                   </Grid>
                 </Grid>
                 <Button
