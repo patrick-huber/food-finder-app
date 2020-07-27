@@ -156,12 +156,16 @@ class EventEdit extends Component {
   }
 
   handleDayChange = (add,field) => {
+    var formData = {...this.state.formData}
+
     if(add) {
       this.state.daysSet.add(field);
     } else {
       this.state.daysSet.delete(field);
     }
-    console.log([...this.state.daysSet])
+    formData.days = [...this.state.daysSet];
+
+    this.setState({formData});
   }
 
   handleNotesChange = (value) => {
@@ -277,31 +281,31 @@ class EventEdit extends Component {
                         <FormLabel component="legend">Days</FormLabel>
                         <FormGroup>
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[1]} onChange={(e, value) => {this.handleDayChange(value,1)}} name="Monday" />}
+                            control={<Checkbox checked={daysSet.has(1)} onChange={(e, value) => {this.handleDayChange(value,1)}} name="Monday" />}
                             label="Monday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[2]} onChange={(e, value) => {this.handleDayChange(value,2)}} name="Tuesday" />}
+                            control={<Checkbox checked={daysSet.has(2)} onChange={(e, value) => {this.handleDayChange(value,2)}} name="Tuesday" />}
                             label="Tuesday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[3]} onChange={(e, value) => {this.handleDayChange(value,3)}} name="Wednesday" />}
+                            control={<Checkbox checked={daysSet.has(3)} onChange={(e, value) => {this.handleDayChange(value,3)}} name="Wednesday" />}
                             label="Wednesday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[4]} onChange={(e, value) => {this.handleDayChange(value,4)}} name="Thursday" />}
+                            control={<Checkbox checked={daysSet.has(4)} onChange={(e, value) => {this.handleDayChange(value,4)}} name="Thursday" />}
                             label="Thursday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[5]} onChange={(e, value) => {this.handleDayChange(value,5)}} name="Friday" />}
+                            control={<Checkbox checked={daysSet.has(5)} onChange={(e, value) => {this.handleDayChange(value,5)}} name="Friday" />}
                             label="Friday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[6]} onChange={(e, value) => {this.handleDayChange(value,6)}} name="Saturday" />}
+                            control={<Checkbox checked={daysSet.has(6)} onChange={(e, value) => {this.handleDayChange(value,6)}} name="Saturday" />}
                             label="Saturday"
                           />
                           <FormControlLabel
-                            control={<Checkbox checked={formData.days[0]} onChange={(e, value) => {this.handleDayChange(value,0)}} name="Sunday" />}
+                            control={<Checkbox checked={daysSet.has(0)} onChange={(e, value) => {this.handleDayChange(value,0)}} name="Sunday" />}
                             label="Sunday"
                           />
                         </FormGroup>
