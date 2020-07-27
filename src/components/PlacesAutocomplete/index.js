@@ -111,6 +111,7 @@ export default function GoogleMaps(props) {
         includeInputInList
         filterSelectedOptions
         value={value}
+        noOptionsText="Search for a location"
         onChange={(event, newValue) => {
           handleOnChange(newValue);
         }}

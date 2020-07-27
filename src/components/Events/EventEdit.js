@@ -123,7 +123,7 @@ class EventEdit extends Component {
   handleStartDateChange = (time) => {
     let newFormData = this.state.formData;
     newFormData['start_time'] = time;
-    
+
     this.setState( {
       formData: newFormData,
     });
@@ -133,7 +133,7 @@ class EventEdit extends Component {
     // Check closing date > opening date
     let newFormData = this.state.formData;
     newFormData['end_time'] = time;
-    
+
     this.setState( {
       formData: newFormData,
     });
@@ -153,6 +153,15 @@ class EventEdit extends Component {
       this.state.daysSet.delete(field);
     }
     console.log([...this.state.daysSet])
+  }
+
+  handleNotesChange = (value) => {
+    let newFormData = this.state.formData;
+    newFormData['notes'] = value;
+
+    this.setState( {
+      formData: newFormData,
+    });
   }
 
   render() {
@@ -185,6 +194,7 @@ class EventEdit extends Component {
                   <Grid item xs={12}>
                     <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
                   </Grid>
+                  {recurring === "no" &&
                   <Grid item xs={12} sm={12}>
                     <DatePicker
                       disablePast
@@ -195,9 +205,39 @@ class EventEdit extends Component {
                       KeyboardButtonProps={{
                         'aria-label': 'change start date',
                       }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                     />
                   </Grid>
+                  } {recurring === "yes" &&
+                    <React.Fragment>
+                      <Grid item xs={12} sm={6}>
+                        <DatePicker
+                          disablePast
+                          id="recurring-start-date-picker"
+                          label="Start Date"
+                          value={formData.start_time}
+                          onChange={(value) => {this.handleStartDateChange(value)}}
+                          KeyboardButtonProps={{
+                            'aria-label': 'change start date',
+                          }}
+                          renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <DatePicker
+                          disablePast
+                          id="recurring-end-date-picker"
+                          label="End Date"
+                          value={formData.end_time}
+                          onChange={(value) => {this.handleEndDateChange(value)}}
+                          KeyboardButtonProps={{
+                            'aria-label': 'change end date',
+                          }}
+                          renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                        />
+                      </Grid>
+                    </React.Fragment>
+                  }
                   <Grid item xs={12} sm={6}>
                     <TimePicker
                       id="start-time-picker"
@@ -207,7 +247,7 @@ class EventEdit extends Component {
                       KeyboardButtonProps={{
                         'aria-label': 'change opening time',
                       }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -219,7 +259,7 @@ class EventEdit extends Component {
                       KeyboardButtonProps={{
                         'aria-label': 'change closing time',
                       }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                     />
                   </Grid>
                   {recurring === "yes" &&
@@ -259,6 +299,11 @@ class EventEdit extends Component {
                       </FormControl>
                     </Grid>
                   }
+                  <Grid item xs={12} sm={12}>
+                    <form noValidate autoComplete="off">
+                      <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
+                    </form>
+                  </Grid>
                 </Grid>
                 <Button
                   type="submit"
@@ -267,15 +312,8 @@ class EventEdit extends Component {
                   color="primary"
                   className={classes.submit}
                 >
-                  Sign Up
+                  Create Event
                 </Button>
-                <Grid container justify="flex-end">
-                  <Grid item>
-                    <Link href="#" variant="body2">
-                      Already have an account? Sign in
-                    </Link>
-                  </Grid>
-                </Grid>
               </form>
             </LocalizationProvider>
           </div>
