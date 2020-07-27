@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { compose } from 'recompose';
 
@@ -80,10 +80,18 @@ function EventsPage(props) {
           </div>
           <Paper elevation={0} className={classes.paperCallout}>
             <Switch>
-              <Route exact path={ROUTES.EVENTS} component={EventList} />
-              <Route exact path={ROUTES.EVENT_VIEW} component={EventView} />
-              <Route path={ROUTES.EVENT_EDIT} component={EventEdit} />
-              <Route exact path={ROUTES.EVENT_NEW} component={EventEdit} />
+              <Route exact path={ROUTES.EVENTS} render={(routeProps) => (
+                <EventList authUser={props.authUser} {...routeProps} />
+              )} />
+              <Route exact path={ROUTES.EVENT_VIEW} render={(routeProps) => (
+                <EventView authUser={props.authUser} {...routeProps} />
+              )} />
+              <Route exact path={ROUTES.EVENT_EDIT} render={(routeProps) => (
+                <EventEdit authUser={props.authUser} {...routeProps} />
+              )} />
+              <Route exact path={ROUTES.EVENT_NEW} render={(routeProps) => (
+                <EventEdit authUser={props.authUser} {...routeProps} />
+              )} />
             </Switch>
           </Paper>
         </Container>

@@ -17,6 +17,13 @@ import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 
+import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
+import {
+  LocalizationProvider,
+  DatePicker,
+  TimePicker,
+} from '@material-ui/pickers';
+
 import { withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 
@@ -52,13 +59,27 @@ class EventEdit extends Component {
       loading: false,
       newEvent: false,
       event: null,
+      formData: {
+        vendor: this.props.authUser.vendor,
+        location: null,
+        address: null,
+        start_time: new Date(),
+        end_time: new Date(),
+        recurring_start: new Date(),
+        recurring_end: new Date(),
+        days: null,
+        notes: null,
+        last_updated: new Date(),
+      },
       ...props.location.state,
     };
   }
 
   componentDidMount() {
     if(this.props.match.path === ROUTES.EVENT_NEW) {
-      return this.setState({newEvent: true});
+      return this.setState({
+        newEvent: true,
+      });
     }
 
     if (this.state.event) {
@@ -72,6 +93,7 @@ class EventEdit extends Component {
       .onSnapshot(snapshot => {
         this.setState({
           event: snapshot.data(),
+          formData: snapshot.data(),
           loading: false,
         });
       });
@@ -81,8 +103,27 @@ class EventEdit extends Component {
     this.unsubscribe && this.unsubscribe();
   }
 
+  locationValueChange = (value, geo) => {
+    this.setState( {
+      formData: {
+        location: geo.geometry.location,
+        address: value.description,
+        ...this.formData
+      }
+    });
+  }
+
+  handleStartDateChange = (time) => {
+    this.setState( {
+      formData: {
+        start_time: time,
+        ...this.formData
+      }
+    })
+  }
+
   render() {
-    const { newEvent, event, loading } = this.state;
+    const { newEvent, event, loading, formData } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
@@ -97,81 +138,74 @@ class EventEdit extends Component {
             <Typography component="h1" variant="h5">
               {headerText}
             </Typography>
-            <form className={classes.form}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <LocationSearchInput />
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Location"
-                    helperText="Address or "
-                    name="email"
-                    autoComplete="address"
-                  />
+            <LocalizationProvider dateAdapter={DateFnsUtils}>
+              <form className={classes.form}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <DatePicker
+                      disablePast
+                      id="start-date-picker"
+                      label="Date"
+                      value={formData.start_time}
+                      onChange={(value,geo) => {this.handleStartDateChange(value)}}
+                      KeyboardButtonProps={{
+                        'aria-label': 'change start date',
+                      }}
+                      renderInput={props => <TextField fullWidth variant="outlined" {...props} />}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TimePicker
+                      id="start-time-picker"
+                      label="Open time"
+                      value={formData.start_time}
+                      onChange={(value,geo) => {this.handleStartDateChange(value)}}
+                      KeyboardButtonProps={{
+                        'aria-label': 'change opening time',
+                      }}
+                      renderInput={props => <TextField fullWidth variant="outlined" {...props} />}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      required
+                      fullWidth
+                      name="password"
+                      label="Password"
+                      type="password"
+                      id="password"
+                      autoComplete="current-password"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={<Checkbox value="allowExtraEmails" color="primary" />}
+                      label="I want to receive inspiration, marketing promotions and updates via email."
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    autoComplete="fname"
-                    name="firstName"
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="firstName"
-                    label="First Name"
-                    autoFocus
-                  />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Sign Up
+                </Button>
+                <Grid container justify="flex-end">
+                  <Grid item>
+                    <Link href="#" variant="body2">
+                      Already have an account? Sign in
+                    </Link>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="lastName"
-                    label="Last Name"
-                    name="lastName"
-                    autoComplete="lname"
-                  />
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox value="allowExtraEmails" color="primary" />}
-                    label="I want to receive inspiration, marketing promotions and updates via email."
-                  />
-                </Grid>
-              </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-              >
-                Sign Up
-              </Button>
-              <Grid container justify="flex-end">
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    Already have an account? Sign in
-                  </Link>
-                </Grid>
-              </Grid>
-            </form>
+              </form>
+            </LocalizationProvider>
           </div>
         </Container>
         {loading && <div>Loading ...</div>}

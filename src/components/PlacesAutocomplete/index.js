@@ -13,6 +13,7 @@ import throttle from 'lodash/throttle';
 
 const libraries = ['places'];
 const autocompleteService = { current: null };
+const geocoder = { current: null };
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function GoogleMaps() {
+export default function GoogleMaps(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -34,6 +35,31 @@ export default function GoogleMaps() {
       }, 200),
     [],
   );
+
+  function handleOnChange(newValue) {
+    // Set autocomplete UI 
+    setOptions(newValue ? [newValue, ...options] : options);
+    setValue(newValue);
+
+    if(newValue) {
+      // get geolocation and set form value
+      if (!geocoder.current && window.google) {
+        geocoder.current = new window.google.maps.Geocoder();
+      }
+
+      geocoder.current.geocode({placeId: newValue.place_id}, (results, status) => {
+        if (status === "OK") {
+          if (results[0]) {
+            props.valueChange(newValue, results[0]);
+          } else {
+            window.alert("No results found");
+          }
+        } else {
+          window.alert("Geocoder failed due to: " + status);
+        }
+      });
+    }
+  }
 
   React.useEffect(() => {
     let active = true;
@@ -78,7 +104,6 @@ export default function GoogleMaps() {
     >
       <Autocomplete
         id="google-map-demo"
-        style={{ width: 300 }}
         getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
         filterOptions={(x) => x}
         options={options}
@@ -87,14 +112,13 @@ export default function GoogleMaps() {
         filterSelectedOptions
         value={value}
         onChange={(event, newValue) => {
-          setOptions(newValue ? [newValue, ...options] : options);
-          setValue(newValue);
+          handleOnChange(newValue);
         }}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
         }}
         renderInput={(params) => (
-          <TextField {...params} label="Add a location" variant="outlined" fullWidth />
+          <TextField {...params} required label="Location" variant="outlined" fullWidth />
         )}
         renderOption={(option) => {
           const matches = option.structured_formatting.main_text_matched_substrings;

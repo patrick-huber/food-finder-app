@@ -1,10 +1,19 @@
 import React, { Component } from 'react';
+import { compose } from 'recompose';
 
 import * as ROLES from '../../constants/roles';
 import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
 import EventList from './EventList';
 import { Spinner } from '../Loading';
+
+import { withStyles } from "@material-ui/core/styles";
+
+const styles = theme => ({
+  root: {
+    backgroundColor: "red"
+  },
+});
 
 class Events extends Component {
   constructor(props) {
@@ -83,4 +92,7 @@ const Auth = (firebase) => (
     </AuthUserContext.Consumer>
 );
 
-export default withFirebase(Auth);
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  withFirebase,
+)(Events);
