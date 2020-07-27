@@ -9,8 +9,13 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -59,6 +64,8 @@ class EventEdit extends Component {
       loading: false,
       newEvent: false,
       event: null,
+      recurring: "no",
+      daysSet: new Set(),
       formData: {
         vendor: this.props.authUser.vendor,
         location: null,
@@ -67,7 +74,7 @@ class EventEdit extends Component {
         end_time: new Date(),
         recurring_start: new Date(),
         recurring_end: new Date(),
-        days: null,
+        days: [],
         notes: null,
         last_updated: new Date(),
       },
@@ -104,36 +111,52 @@ class EventEdit extends Component {
   }
 
   locationValueChange = (value, geo) => {
-    this.setState( {
-      formData: {
-        location: geo.geometry.location,
-        address: value.description,
-        ...this.formData
-      }
+    let newFormData = this.state.formData;
+    newFormData['location'] = geo.geometry.location;
+    newFormData['address'] = value.description;
+
+    this.setState({
+      formData: newFormData,
     });
   }
 
   handleStartDateChange = (time) => {
+    let newFormData = this.state.formData;
+    newFormData['start_time'] = time;
+    
     this.setState( {
-      formData: {
-        start_time: time,
-        ...this.formData
-      }
-    })
+      formData: newFormData,
+    });
   }
 
   handleEndDateChange = (time) => {
     // Check closing date > opening date
+    let newFormData = this.state.formData;
+    newFormData['end_time'] = time;
+    
     this.setState( {
-      formData: {
-        end_time: time,
-        ...this.formData
-      }
-    })
+      formData: newFormData,
+    });
+  }
+
+  handleRecurringChange = (value) => {
+    // Check closing date > opening date
+    this.setState( {
+      recurring: value,
+    });
+  }
+
+  handleDayChange = (add,field) => {
+    if(add) {
+      this.state.daysSet.add(field);
+    } else {
+      this.state.daysSet.delete(field);
+    }
+    console.log([...this.state.daysSet])
   }
 
   render() {
-    const { newEvent, event, loading, formData } = this.state;
+    const { newEvent, event, loading, formData, recurring } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
@@ -151,10 +174,18 @@ class EventEdit extends Component {
             <LocalizationProvider dateAdapter={DateFnsUtils}>
               <form className={classes.form}>
                 <Grid container spacing={2}>
+                  <Grid item xs={12} sm={12}>
+                    <FormControl required fullWidth component="fieldset">
+                      <RadioGroup row aria-label="one time or recurring event" name="recurring" value={recurring} onChange={(e, value) => {this.handleRecurringChange(value)}}>
+                        <FormControlLabel value="no" control={<Radio />} label="One Time" />
+                        <FormControlLabel value="yes" control={<Radio />} label="Recurring" />
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={12}>
                     <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={12}>
                     <DatePicker
                       disablePast
                       id="start-date-picker"
@@ -191,12 +222,43 @@ class EventEdit extends Component {
                       renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <FormControlLabel
-                      control={<Checkbox value="allowExtraEmails" color="primary" />}
-                      label="I want to receive inspiration, marketing promotions and updates via email."
-                    />
-                  </Grid>
+                  {recurring === "yes" &&
+                    <Grid item xs={12} sm={6}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Days</FormLabel>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[1]} onChange={(e, value) => {this.handleDayChange(value,1)}} name="Monday" />}
+                            label="Monday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[2]} onChange={(e, value) => {this.handleDayChange(value,2)}} name="Tuesday" />}
+                            label="Tuesday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[3]} onChange={(e, value) => {this.handleDayChange(value,3)}} name="Wednesday" />}
+                            label="Wednesday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[4]} onChange={(e, value) => {this.handleDayChange(value,4)}} name="Thursday" />}
+                            label="Thursday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[5]} onChange={(e, value) => {this.handleDayChange(value,5)}} name="Friday" />}
+                            label="Friday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[6]} onChange={(e, value) => {this.handleDayChange(value,6)}} name="Saturday" />}
+                            label="Saturday"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox checked={formData.days[0]} onChange={(e, value) => {this.handleDayChange(value,0)}} name="Sunday" />}
+                            label="Sunday"
+                          />
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                  }
                 </Grid>
                 <Button
                   type="submit"
