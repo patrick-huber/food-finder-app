@@ -1,59 +1,186 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
+import { compose } from 'recompose';
 
-import Footer from '../Footer';
+import * as ROUTES from '../../constants/routes';
 
+import { withFirebase } from '../Firebase';
+
+import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
-import List from '@material-ui/core/List';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import RoomIcon from '@material-ui/icons/Room';
-import FacebookIcon from '@material-ui/icons/Facebook';
-import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import EventIcon from '@material-ui/icons/Event';
+import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles((theme) => ({
-  appBarSpacer: theme.mixins.toolbar,
-  buttonGroup: {
-    marginTop: theme.spacing(4),
+import { withStyles } from "@material-ui/core/styles";
+import Container from '@material-ui/core/Container';
+
+import LocationSearchInput from '../PlacesAutocomplete';
+
+const styles = theme => ({
+  root: {
+    backgroundColor: "red"
   },
-  cardGrid: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
+  paper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  section: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.primary.main,
   },
-  paperCallout: {
-    marginTop: 30,
-    marginBottom: 20,
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+});
+
+class EventEdit extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: false,
+      newEvent: false,
+      event: null,
+      ...props.location.state,
+    };
   }
-}));
 
+  componentDidMount() {
+    if(this.props.match.path === ROUTES.EVENT_NEW) {
+      return this.setState({newEvent: true});
+    }
 
-export default function EventsPage(props) {
-  const classes = useStyles();
-  const [event, setEvent] = useState(props.location.state.event);
+    if (this.state.event) {
+      return;
+    }
 
+    this.setState({ loading: true });
 
-  useEffect(() => {
-    
-  });
+    this.unsubscribe = this.props.firebase
+      .calendarDetails(this.props.match.params.id)
+      .onSnapshot(snapshot => {
+        this.setState({
+          event: snapshot.data(),
+          loading: false,
+        });
+      });
+  }
 
-  return (
-    <React.Fragment>
-      <Typography component="h2" variant="h5" align="center" color="textPrimary" gutterBottom>
-        Edit Event {event.vendor}
-      </Typography>
-    </React.Fragment>
-  );
+  componentWillUnmount() {
+    this.unsubscribe && this.unsubscribe();
+  }
+
+  render() {
+    const { newEvent, event, loading } = this.state;
+    const { classes } = this.props;
+    const headerText = newEvent ? 'New Event' : 'Edit Event';
+
+    return (
+      <React.Fragment>
+        <Container component="main" maxWidth="sm">
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <EventIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              {headerText}
+            </Typography>
+            <form className={classes.form}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <LocationSearchInput />
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Location"
+                    helperText="Address or "
+                    name="email"
+                    autoComplete="address"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="fname"
+                    name="firstName"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="lname"
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={<Checkbox value="allowExtraEmails" color="primary" />}
+                    label="I want to receive inspiration, marketing promotions and updates via email."
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Sign Up
+              </Button>
+              <Grid container justify="flex-end">
+                <Grid item>
+                  <Link href="#" variant="body2">
+                    Already have an account? Sign in
+                  </Link>
+                </Grid>
+              </Grid>
+            </form>
+          </div>
+        </Container>
+        {loading && <div>Loading ...</div>}
+      </React.Fragment>
+    );
+  }
 }
+
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  withFirebase,
+)(EventEdit);

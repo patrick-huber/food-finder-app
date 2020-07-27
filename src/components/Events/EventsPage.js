@@ -44,8 +44,19 @@ const useStyles = makeStyles((theme) => ({
   paperCallout: {
     marginTop: 30,
     marginBottom: 20,
+    padding: 20,
   }
 }));
+
+const NewEventButton = () => (
+  <Route render={({ history}) => (
+    <Button variant="contained" color="primary"
+      onClick={() => { history.push(ROUTES.EVENT_NEW) }}
+    >
+      Add New Event
+    </Button>
+  )} />
+)
 
 
 function EventsPage(props) {
@@ -56,15 +67,23 @@ function EventsPage(props) {
       <CssBaseline />
       <div className={classes.appBarSpacer} />
       <main>
-        <Container className={classes.section} maxWidth="sm">
+        <Container className={classes.section} maxWidth="md">
           <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
             Events
           </Typography>
-          <Paper elevation={0} spacing={2} className={classes.paperCallout}>
+          <div className={classes.buttonGroup}>
+            <Grid container spacing={2} justify="center">
+              <Grid item>
+                <NewEventButton />
+              </Grid>
+            </Grid>
+          </div>
+          <Paper elevation={0} className={classes.paperCallout}>
             <Switch>
               <Route exact path={ROUTES.EVENTS} component={EventList} />
               <Route exact path={ROUTES.EVENT_VIEW} component={EventView} />
-              <Route exact path={ROUTES.EVENT_EDIT} component={EventEdit} />
+              <Route path={ROUTES.EVENT_EDIT} component={EventEdit} />
+              <Route exact path={ROUTES.EVENT_NEW} component={EventEdit} />
             </Switch>
           </Paper>
         </Container>

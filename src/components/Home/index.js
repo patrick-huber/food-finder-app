@@ -1,4 +1,6 @@
 import React from 'react';
+import { Route } from "react-router-dom";
+import * as ROUTES from '../../constants/routes';
 import { compose } from 'recompose';
 
 import { withAuthorization, withEmailVerification } from '../Session';
@@ -43,6 +45,16 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const NewEventButton = () => (
+  <Route render={({ history}) => (
+    <Button variant="contained" color="primary"
+      onClick={() => { history.push(ROUTES.EVENT_NEW) }}
+    >
+      Add New Event
+    </Button>
+  )} />
+)
+
 
 function HomePage(props) {
   const classes = useStyles();
@@ -62,9 +74,7 @@ function HomePage(props) {
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">
               <Grid item>
-                <Button variant="contained" color="primary" onClick={() => {}}>
-                  Add New Event
-                </Button>
+                <NewEventButton />
               </Grid>
             </Grid>
           </div>
