@@ -22,7 +22,7 @@ import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 
-import { setMinutes, getMinutes, setHours, getHours } from 'date-fns';
+import { set, setMinutes, getMinutes, setHours, getHours, startOfDay } from 'date-fns';
 
 import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import {
@@ -61,6 +61,7 @@ const styles = theme => ({
 class EventEdit extends Component {
   constructor(props) {
     super(props);
+    const today = new Date();
 
     this.state = {
       loading: false,
@@ -72,13 +73,13 @@ class EventEdit extends Component {
         vendor: this.props.authUser.vendor,
         location: null,
         address: null,
-        start_time: new Date(),
-        end_time: new Date(),
-        recurring_start: new Date(),
-        recurring_end: new Date(),
+        start_time: set(today, { hours: 11, minutes: 0 }),
+        end_time: set(today, { hours: 19, minutes: 0 }),
+        recurring_start: startOfDay(today),
+        recurring_end: startOfDay(today),
         days: [],
         notes: null,
-        last_updated: new Date(),
+        last_updated: today,
       },
       ...props.location.state,
     };
