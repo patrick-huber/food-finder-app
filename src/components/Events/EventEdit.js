@@ -22,6 +22,8 @@ import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 
+import { setMinutes, getMinutes, setHours, getHours } from 'date-fns';
+
 import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import {
   LocalizationProvider,
@@ -123,6 +125,12 @@ class EventEdit extends Component {
   handleStartDateChange = (time) => {
     let newFormData = this.state.formData;
     newFormData['start_time'] = time;
+    if(this.state.recurring === 'no') {
+      let endDate = setMinutes(time, getMinutes(this.state.formData.end_time));
+          endDate = setHours(endDate, getHours(this.state.formData.end_time));
+
+      newFormData['end_time'] = endDate;
+    }
 
     this.setState( {
       formData: newFormData,
