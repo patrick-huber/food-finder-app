@@ -65,6 +65,8 @@ class EventEdit extends Component {
 
     this.state = {
       loading: false,
+      errorEndTime: false,
+      errorEndTimeText: null,
       newEvent: false,
       event: null,
       recurring: "no",
@@ -124,27 +126,43 @@ class EventEdit extends Component {
   }
 
   handleStartDateChange = (time) => {
-    let newFormData = this.state.formData;
-    newFormData['start_time'] = time;
-    if(this.state.recurring === 'no') {
-      let endDate = setMinutes(time, getMinutes(this.state.formData.end_time));
-          endDate = setHours(endDate, getHours(this.state.formData.end_time));
+    let formData = this.state.formData;
+        formData['start_time'] = time;
 
-      newFormData['end_time'] = endDate;
+    let endDate = setMinutes(time, getMinutes(this.state.formData.end_time));
+        endDate = setHours(endDate, getHours(this.state.formData.end_time));
+
+    if(this.state.recurring === 'no') {
+      formData['end_time'] = endDate;
+      formData['recurring_start'] = startOfDay(endDate);
     }
 
+    this.setEndDateError(endDate <= formData.start_time);
     this.setState( {
-      formData: newFormData,
+      formData: formData,
     });
   }
 
   handleEndDateChange = (time) => {
-    // Check closing date > opening date
-    let newFormData = this.state.formData;
-    newFormData['end_time'] = time;
+    let formData = this.state.formData;
+        formData['end_time'] = time;
+        formData['recurring_end'] = time;
+
+    let tempEndTime = setHours(formData.start_time, getHours(time));
+        tempEndTime = setMinutes(tempEndTime, getMinutes(time));
+
+    this.setEndDateError(tempEndTime <= formData.start_time);
+    this.setState( {
+      formData: formData,
+    });
+  }
+
+  setEndDateError = (state) => {
+    const errorText = state ? "Closing time must be after opening time." : null;
 
     this.setState( {
-      formData: newFormData,
+      errorEndTime: state,
+      errorEndTimeText: errorText,
     });
   }
 
@@ -178,13 +196,13 @@ class EventEdit extends Component {
   }
 
   render() {
-    const { newEvent, event, loading, formData, recurring } = this.state;
+    const { newEvent, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
     return (
       <React.Fragment>
-        <Container component="main" maxWidth="sm">
+        <Container component="main" maxWidth="xs">
           <CssBaseline />
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
@@ -239,6 +257,7 @@ class EventEdit extends Component {
                       <Grid item xs={12} sm={6}>
                         <DatePicker
                           disablePast
+                          minDate={formData.start_time}
                           id="recurring-end-date-picker"
                           label="End Date"
                           value={formData.end_time}
@@ -260,19 +279,20 @@ class EventEdit extends Component {
                       KeyboardButtonProps={{
                         'aria-label': 'change opening time',
                       }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                      renderInput={props => <TextField {...props} error={errorEndTime} helperText={null} required fullWidth variant="outlined" />}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TimePicker
-                      id="start-time-picker"
+                      minDate={formData.start_time}
+                      id="end-time-picker"
                       label="Closing time"
                       value={formData.end_time}
                       onChange={(value) => {this.handleEndDateChange(value)}}
                       KeyboardButtonProps={{
                         'aria-label': 'change closing time',
                       }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                      renderInput={props => <TextField {...props} error={errorEndTime} helperText={errorEndTimeText} required fullWidth variant="outlined"  />}
                     />
                   </Grid>
                   {recurring === "yes" &&
