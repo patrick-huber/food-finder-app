@@ -122,6 +122,16 @@ class EventEdit extends Component {
     })
   }
 
+  handleEndDateChange = (time) => {
+    // Check closing date > opening date
+    this.setState( {
+      formData: {
+        end_time: time,
+        ...this.formData
+      }
+    })
+  }
+
   render() {
     const { newEvent, event, loading, formData } = this.state;
     const { classes } = this.props;
@@ -150,35 +160,35 @@ class EventEdit extends Component {
                       id="start-date-picker"
                       label="Date"
                       value={formData.start_time}
-                      onChange={(value,geo) => {this.handleStartDateChange(value)}}
+                      onChange={(value) => {this.handleStartDateChange(value)}}
                       KeyboardButtonProps={{
                         'aria-label': 'change start date',
                       }}
-                      renderInput={props => <TextField fullWidth variant="outlined" {...props} />}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TimePicker
                       id="start-time-picker"
-                      label="Open time"
+                      label="Opening time"
                       value={formData.start_time}
-                      onChange={(value,geo) => {this.handleStartDateChange(value)}}
+                      onChange={(value) => {this.handleStartDateChange(value)}}
                       KeyboardButtonProps={{
                         'aria-label': 'change opening time',
                       }}
-                      renderInput={props => <TextField fullWidth variant="outlined" {...props} />}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      variant="outlined"
-                      required
-                      fullWidth
-                      name="password"
-                      label="Password"
-                      type="password"
-                      id="password"
-                      autoComplete="current-password"
+                  <Grid item xs={12} sm={6}>
+                    <TimePicker
+                      id="start-time-picker"
+                      label="Closing time"
+                      value={formData.end_time}
+                      onChange={(value) => {this.handleEndDateChange(value)}}
+                      KeyboardButtonProps={{
+                        'aria-label': 'change closing time',
+                      }}
+                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} />}
                     />
                   </Grid>
                   <Grid item xs={12}>
