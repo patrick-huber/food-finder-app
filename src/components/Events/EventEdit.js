@@ -511,6 +511,5 @@ const condition = authUser => !!authUser;
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  withEmailVerification,
   withAuthorization(condition),
 )(EventEdit);
