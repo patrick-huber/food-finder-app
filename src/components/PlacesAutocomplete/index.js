@@ -29,7 +29,7 @@ export default function GoogleMaps(props) {
   const [options, setOptions] = React.useState([]);
 
   React.useEffect(() => {
-    setValue(props.defaultValue)
+    if(!value) setValue(props.defaultValue);
   },[props.defaultValue]);
 
   const fetch = React.useMemo(

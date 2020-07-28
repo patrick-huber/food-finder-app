@@ -9,6 +9,9 @@ import { withAuthorization, withEmailVerification } from '../Session';
 import Footer from '../Footer';
 import { Fullscreen } from '../Loading';
 
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -53,11 +56,10 @@ const styles = theme => ({
     paddingBottom: theme.spacing(8),
   },
   section: {
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(4),
   },
   paperCallout: {
-    marginTop: 30,
     marginBottom: 20,
     padding: 20,
   },
@@ -254,21 +256,26 @@ class EventEdit extends Component {
     e.preventDefault();
     this.setState({errorMissing: false});
 
-    // Add one day to last recurring day to account for final day
-    data['recurring_end'] = addDays(data.recurring_end, 1);
     // Set update time
     data['last_updated'] = new Date();
 
     // Validation
     for (const [key, value] of Object.entries(data)) {
       if(!value && key !== 'notes') {
+        console.log('missing field: '+ key)
         return this.setState({errorMissing: true});
       }
     }
 
-    // Const correct firestore objects
-    const locationObj = data.location.toJSON()
-    data['location'] = new this.props.firebase.firestore.GeoPoint(locationObj.lat, locationObj.lng);
+    // Update data for firestore
+    // Add one day to last recurring day to account for final day
+    data['recurring_end'] = addDays(data.recurring_end, 1);
+    
+    if(data.location.toJSON) {
+      // Convert location to GeoPoint object
+      const locationObj = data.location.toJSON();
+      data['location'] = new this.props.firebase.firestore.GeoPoint(locationObj.lat, locationObj.lng);
+    }
 
     // remove recurring fields for one-time event
     if(this.state.recurring === "no") {
@@ -280,8 +287,12 @@ class EventEdit extends Component {
       delete data.notes;
     }
 
+    if(this.state.newEvent) {
+      this.addEventFirestore(data);
+    } else {
+      this.updateEventFirestore(data);
+    }
 
-    this.addEventFirestore(data);
   }
 
   addEventFirestore = (eventData) => {
@@ -291,7 +302,7 @@ class EventEdit extends Component {
         console.log("Document written with ID: ", docRef.id);
         this.props.history.push({
           pathname: ROUTES.EVENTS,
-          state: { action: 'new-event-success' }
+          state: { action: 'Event created successfully.' }
         });
       })
       .catch((error) => {
@@ -299,16 +310,22 @@ class EventEdit extends Component {
         this.setState({updatingFirestore: false});
       });
   }
-      .then(function(docRef) {
-        console.log("Document written with ID: ", docRef.id);
-        scope.props.history.push({
+
+  updateEventFirestore = (eventData) => {
+    this.setState({updatingFirestore: true});
+    this.props.firebase
+      .calendarDetails(this.props.match.params.id)
+      .update(eventData)
+      .then(() => {
+        console.log("Document updated");
+        this.props.history.push({
           pathname: ROUTES.EVENTS,
-          state: { action: 'new-event-success' }
+          state: { action: 'Event updated successfully.' }
         });
       })
-      .catch(function(error) {
+      .catch((error) => {
         alert("Error adding new event. Please reach out to support with these error details: " + error);
-        scope.setState({updatingFirestore: false});
+        this.setState({updatingFirestore: false});
       });
   }
 
@@ -321,12 +338,14 @@ class EventEdit extends Component {
       <React.Fragment>
       <CssBaseline />
       <div className={classes.appBarSpacer} />
-      <main>
-        <Container className={classes.section} maxWidth="md">
-          <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-            Events
-          </Typography>
-          <Paper elevation={0} className={classes.paperCallout}>
+        <main>
+          <Container className={classes.section} maxWidth="sm">
+            <Toolbar>
+              <IconButton edge="start" color="inherit" aria-label="previous page">
+                <ArrowBackIcon onClick={() => { this.props.history.goBack() }} />
+              </IconButton>
+            </Toolbar>
+            <Paper elevation={0} className={classes.paperCallout}>
               <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>

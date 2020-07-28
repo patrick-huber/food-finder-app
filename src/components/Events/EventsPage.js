@@ -63,10 +63,10 @@ function EventsPage(props) {
 
   if(props.location.state) {
     if(props.location.state.action && props.location.state.action) {
+      alert(props.location.state.action);
       props.history.push({
         state: { action: null }
       });
-      alert('Event added successfully!');
     }
   }
 
