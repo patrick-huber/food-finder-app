@@ -17,12 +17,16 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Chip from '@material-ui/core/Chip';
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme => ({
   root: {
     backgroundColor: "red"
   },
+  daysChip: {
+    margin: 2,
+  }
 });
 
 class ActionsMenu extends Component {
@@ -172,6 +176,7 @@ class EventsList extends Component {
 
   render() {
     const { text, events, tableData, loading } = this.state;
+    const { classes } = this.props;
     const columns = [
      {
       name: "date",
@@ -219,12 +224,16 @@ class EventsList extends Component {
       options: {
         filter: true,
         filterType: 'multiselect',
+        filterOptions: {
+          names: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        },
         customBodyRenderLite: (dataIndex) => {
           let value = tableData[dataIndex].days ? tableData[dataIndex].days : [];
           return value.map( (val, key) => {
-            return <span key={key}>{val}s </span>;
+            return <Chip className={classes.daysChip} label={val} key={key} />;
           });
         },
+        sort: false,
       }
      },
      {
