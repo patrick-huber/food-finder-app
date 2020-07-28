@@ -98,6 +98,5 @@ function EventsPage(props) {
 const condition = authUser => !!authUser;
 
 export default compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(EventsPage);
