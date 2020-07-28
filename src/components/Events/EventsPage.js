@@ -77,7 +77,7 @@ function EventsPage(props) {
       <main>
         <Container className={classes.section} maxWidth="md">
           <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-            Events
+            {props.authUser.vendor} Events
           </Typography>
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">

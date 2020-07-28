@@ -3,9 +3,15 @@ import { compose } from 'recompose';
 
 import * as ROLES from '../../constants/roles';
 import { AuthUserContext } from '../Session';
-import { withFirebase } from '../Firebase';
+import { withAuthorization } from '../Session';
+
 import EventList from './EventList';
+
 import { Spinner } from '../Loading';
+
+import MUIDataTable from "mui-datatables";
+
+import { format } from 'date-fns';
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -15,6 +21,27 @@ const styles = theme => ({
   },
 });
 
+const columns = [
+ {
+  name: "date",
+  label: "Date",
+  options: {
+   filter: true,
+   sort: true,
+  }
+ },
+ {
+  name: "address",
+  label: "Location",
+  options: {
+   filter: true,
+   sort: true,
+  }
+ },
+];
+const options = {
+};
+
 class Events extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +50,7 @@ class Events extends Component {
       text: '',
       loading: false,
       events: [],
+      tableData: [],
     };
   }
 
@@ -33,14 +61,15 @@ class Events extends Component {
       .calendar()
       .where('vendor', '==', vendor)
       .onSnapshot(snapshot => {
-        let events = [];
-        
         if(snapshot.size) {
+          let events = [];
+          let tableData = [];
+
           snapshot.forEach(doc => {
             events.push({ ...doc.data(), uid: doc.id });
-            this.setState({
-              events: events,
-              loading: false,
+            tableData.push({
+              address: doc.data().address,
+              date: format(doc.data().start_time.toDate(), 'PPPPpp'),
             });
           }, err => {
             alert('Unable to load events. Please try again later.')
@@ -48,6 +77,12 @@ class Events extends Component {
             this.setState({
               loading: false,
             });
+          });
+
+          this.setState({
+            events: events,
+            tableData: tableData,
+            loading: false,
           });
         } else {
           this.setState({ events: null, loading: false });
@@ -61,7 +96,7 @@ class Events extends Component {
   }
 
   render() {
-    const { text, events, loading } = this.state;
+    const { text, events, tableData, loading } = this.state;
 
     return (
       <div>
@@ -69,9 +104,11 @@ class Events extends Component {
           <Spinner />
         }
         {events &&
-          <EventList
-            authUser={this.props.authUser}
-            events={events}
+          <MUIDataTable
+            title={"Events List"}
+            data={tableData}
+            columns={columns}
+            options={options}
           />
         }
         {!events && <div>There are no events ...</div>}
@@ -80,19 +117,9 @@ class Events extends Component {
   }
 }
 
-const Auth = (firebase) => (
-    <AuthUserContext.Consumer>
-      {authUser =>
-        authUser ? (
-          <Events {...firebase} authUser={authUser} />
-        ) : (
-          <div>Unable to load current user</div>
-        )
-      }
-    </AuthUserContext.Consumer>
-);
+const condition = authUser => !!authUser;
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  withFirebase,
+  withAuthorization(condition),
 )(Events);
