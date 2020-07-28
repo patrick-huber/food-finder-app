@@ -280,12 +280,25 @@ class EventEdit extends Component {
       delete data.notes;
     }
 
-    this.addEventFirestore(data, this);
+
+    this.addEventFirestore(data);
   }
 
-  addEventFirestore = (eventData, scope) => {
+  addEventFirestore = (eventData) => {
     this.setState({updatingFirestore: true});
     this.props.firebase.calendar().add(eventData)
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+        this.props.history.push({
+          pathname: ROUTES.EVENTS,
+          state: { action: 'new-event-success' }
+        });
+      })
+      .catch((error) => {
+        alert("Error adding new event. Please reach out to support with these error details: " + error);
+        this.setState({updatingFirestore: false});
+      });
+  }
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
         scope.props.history.push({
