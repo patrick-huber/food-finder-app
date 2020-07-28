@@ -24,6 +24,9 @@ const styles = theme => ({
   root: {
     backgroundColor: "red"
   },
+  dataTable: {
+    // backgroundColor: theme.palette.primary.light,
+  },
   daysChip: {
     margin: 2,
   }
@@ -261,6 +264,7 @@ class EventsList extends Component {
         }
         {events &&
           <MUIDataTable
+            className={classes.dataTable}
             title={"Events List"}
             data={tableData}
             columns={columns}

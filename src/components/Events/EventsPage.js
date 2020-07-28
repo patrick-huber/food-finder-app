@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   buttonGroup: {
     marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
   },
   cardGrid: {
     paddingTop: theme.spacing(8),
@@ -86,9 +87,7 @@ function EventsPage(props) {
               </Grid>
             </Grid>
           </div>
-          <Paper elevation={0} className={classes.paperCallout}>
-            <EventList authUser={props.authUser} {...props} />
-          </Paper>
+          <EventList authUser={props.authUser} {...props} />
         </Container>
       </main>
       <Footer />
