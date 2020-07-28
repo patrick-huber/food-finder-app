@@ -279,12 +279,9 @@ class EventEdit extends Component {
 
     // remove recurring fields for one-time event
     if(this.state.recurring === "no") {
-      delete data.recurring_end;
-      delete data.recurring_start;
-      delete data.days;
-    }
-    if(!data.notes) {
-      delete data.notes;
+      data.recurring_end = null;
+      data.recurring_start = null;
+      data.days = null;
     }
 
     if(this.state.newEvent) {
