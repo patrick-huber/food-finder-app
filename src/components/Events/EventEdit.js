@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
@@ -61,10 +62,11 @@ const styles = theme => ({
 class EventEdit extends Component {
   constructor(props) {
     super(props);
-    const today = new Date();
+    const today = startOfDay(new Date());
 
     this.state = {
       loading: false,
+      errorMissing: false,
       errorEndTime: false,
       errorEndTimeText: null,
       newEvent: false,
@@ -77,8 +79,8 @@ class EventEdit extends Component {
         address: null,
         start_time: set(today, { hours: 11, minutes: 0 }),
         end_time: set(today, { hours: 19, minutes: 0 }),
-        recurring_start: startOfDay(today),
-        recurring_end: startOfDay(today),
+        recurring_start: today,
+        recurring_end: today,
         days: [],
         notes: null,
         last_updated: today,
@@ -132,10 +134,8 @@ class EventEdit extends Component {
     let endDate = setMinutes(time, getMinutes(this.state.formData.end_time));
         endDate = setHours(endDate, getHours(this.state.formData.end_time));
 
-    if(this.state.recurring === 'no') {
-      formData['end_time'] = endDate;
-      formData['recurring_start'] = startOfDay(endDate);
-    }
+    formData['end_time'] = endDate;
+    formData['recurring_start'] = startOfDay(time);
 
     this.setEndDateError(endDate <= formData.start_time);
     this.setState( {
@@ -143,15 +143,23 @@ class EventEdit extends Component {
     });
   }
 
-  handleEndDateChange = (time) => {
+  handleEndHourChange = (time) => {
     let formData = this.state.formData;
         formData['end_time'] = time;
-        formData['recurring_end'] = startOfDay(time);
 
     let tempEndTime = setHours(formData.start_time, getHours(time));
         tempEndTime = setMinutes(tempEndTime, getMinutes(time));
 
     this.setEndDateError(tempEndTime <= formData.start_time);
+    this.setState( {
+      formData: formData,
+    });
+  }
+
+  handleRecurringEndDateChange = (time) => {
+    let formData = this.state.formData;
+        formData['recurring_end'] = startOfDay(time);
+
     this.setState( {
       formData: formData,
     });
@@ -181,7 +189,7 @@ class EventEdit extends Component {
     } else {
       this.state.daysSet.delete(field);
     }
-    formData.days = [...this.state.daysSet];
+    formData.days = [...this.state.daysSet].sort();
 
     this.setState({formData});
   }
@@ -195,23 +203,52 @@ class EventEdit extends Component {
     });
   }
 
-  submitForm = () => {
-    // Form validation
+  submitForm = (e) => {
     let data = this.state.formData;
+    e.preventDefault();
+    this.setState({errorMissing: false});
 
     // Add one day to last recurring day to account for final day
     data['recurring_end'] = addDays(data.recurring_end, 1);
+    // Set update time
+    data['last_updated'] = new Date();
+
+    // Validation
+    for (const [key, value] of Object.entries(data)) {
+      if(!value && key !== 'notes') {
+        return this.setState({errorMissing: true});
+      }
+    }
+
+    // Const correct firestore objects
+    const locationObj = data.location.toJSON()
+    data['location'] = new this.props.firebase.firestore.GeoPoint(locationObj.lat, locationObj.lng);
 
     // remove recurring fields for one-time event
     if(this.state.recurring === "no") {
-      data['recurring_end'] = null;
-      data['recurring_start'] = null;
-      data['days'] = null;
+      delete data.recurring_end;
+      delete data.recurring_start;
+      delete data.days;
     }
+    if(!data.notes) {
+      delete data.notes;
+    }
+
+    this.addEventFirestore(data);
+  }
+
+  addEventFirestore = (eventData) => {
+    this.props.firebase.calendar().add(eventData)
+      .then(function(docRef) {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch(function(error) {
+        console.error("Error adding document: ", error);
+      });
   }
 
   render() {
-    const { newEvent, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
+    const { newEvent, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
@@ -228,6 +265,8 @@ class EventEdit extends Component {
             </Typography>
             <LocalizationProvider dateAdapter={DateFnsUtils}>
               <form className={classes.form}>
+
+                
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
                     <FormControl required fullWidth component="fieldset">
@@ -249,7 +288,7 @@ class EventEdit extends Component {
                       value={formData.start_time}
                       onChange={(value) => {this.handleStartDateChange(value)}}
                       KeyboardButtonProps={{
-                        'aria-label': 'change start date',
+                        'aria-label': 'change event date',
                       }}
                       renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                     />
@@ -264,7 +303,7 @@ class EventEdit extends Component {
                           value={formData.start_time}
                           onChange={(value) => {this.handleStartDateChange(value)}}
                           KeyboardButtonProps={{
-                            'aria-label': 'change start date',
+                            'aria-label': 'change recurring start date',
                           }}
                           renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                         />
@@ -272,13 +311,13 @@ class EventEdit extends Component {
                       <Grid item xs={12} sm={6}>
                         <DatePicker
                           disablePast
-                          minDate={formData.start_time}
                           id="recurring-end-date-picker"
                           label="Last Day"
-                          value={formData.end_time}
-                          onChange={(value) => {this.handleEndDateChange(value)}}
+                          value={formData.recurring_end}
+                          minDate={formData.start_time}
+                          onChange={(value) => {this.handleRecurringEndDateChange(value)}}
                           KeyboardButtonProps={{
-                            'aria-label': 'change end date',
+                            'aria-label': 'change recurring end date',
                           }}
                           renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                         />
@@ -299,11 +338,10 @@ class EventEdit extends Component {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TimePicker
-                      minDate={formData.start_time}
                       id="end-time-picker"
                       label="Closing time"
                       value={formData.end_time}
-                      onChange={(value) => {this.handleEndDateChange(value)}}
+                      onChange={(value) => {this.handleEndHourChange(value)}}
                       KeyboardButtonProps={{
                         'aria-label': 'change closing time',
                       }}
@@ -358,9 +396,11 @@ class EventEdit extends Component {
                   variant="contained"
                   color="primary"
                   className={classes.submit}
+                  onClick={(event) => {this.submitForm(event)}}
                 >
                   Create Event
                 </Button>
+                {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
               </form>
             </LocalizationProvider>
           </div>
