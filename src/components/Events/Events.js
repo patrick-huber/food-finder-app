@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, setState } from 'react';
 import { compose } from 'recompose';
 
 import * as ROLES from '../../constants/roles';
@@ -13,6 +13,10 @@ import MUIDataTable from "mui-datatables";
 
 import { format } from 'date-fns';
 
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@material-ui/core/IconButton';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme => ({
@@ -20,6 +24,51 @@ const styles = theme => ({
     backgroundColor: "red"
   },
 });
+
+class ActionsMenu extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      anchorEl: null,
+      index: props.index,
+    };
+  };
+
+  handleClick = (event) => {
+    this.setState({anchorEl: event.currentTarget});
+  };
+
+  handleClose = () => {
+    this.setState({anchorEl: null});
+  };
+
+  render() {
+    const { anchorEl, index } = this.state;
+    return (
+      <div>
+        <IconButton
+          aria-label="more"
+          aria-controls="long-menu"
+          aria-haspopup="true"
+          onClick={(event) => {this.handleClick(event)}}
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          id={`"actions-${index}"`}
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClick={() => {this.handleClose()}}
+        >
+          <MenuItem onClick={() => {this.handleClose()}}>Edit</MenuItem>
+          <MenuItem onClick={() => {this.handleClose()}}>Delete</MenuItem>
+        </Menu>
+      </div>
+    )
+  }
+}
 
 const columns = [
  {
@@ -38,6 +87,19 @@ const columns = [
    sort: true,
   }
  },
+ {
+  name: "Actions",
+  options: {
+    filter: false,
+    sort: false,
+    empty: true,
+    customBodyRenderLite: (dataIndex) => {
+      return (
+        <ActionsMenu index={dataIndex} />
+      )
+    }
+  }
+ }
 ];
 const options = {
 };
