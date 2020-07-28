@@ -95,23 +95,12 @@ export default function Header() {
   const NavigationAuth = ({ authUser }) => ( 
     <div> 
       <List className={clsx(classes.menuList)} component="nav" aria-label="Primary nav">
-        <Link to={ROUTES.LANDING}>
-          <ListItem
-            button
-            selected
-          >
-            <ListItemIcon>
-              <RoomIcon />
-            </ListItemIcon>
-            <ListItemText primary="Food Finder Map" />
-          </ListItem>
-        </Link>
-        <Link to={ROUTES.HOME}>
+        <Link to={ROUTES.EVENTS}>
           <ListItem
             button
           >
             <ListItemIcon></ListItemIcon>
-            <ListItemText primary="View Events" />
+            <ListItemText primary="Events" />
           </ListItem>
         </Link>
         <Link to={ROUTES.ACCOUNT}>
@@ -119,7 +108,7 @@ export default function Header() {
             button
           >
             <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Edit Profile" />
+            <ListItemText primary="Profile" />
           </ListItem>
         </Link>
         {!!authUser.roles[ROLES.ADMIN] && (
@@ -138,6 +127,18 @@ export default function Header() {
           >
             <ListItemIcon></ListItemIcon>
             <SignOutButton />
+          </ListItem>
+        </Link>
+
+        <Divider />
+        <Link to={ROUTES.LANDING}>
+          <ListItem
+            button
+          >
+            <ListItemIcon>
+              <RoomIcon />
+            </ListItemIcon>
+            <ListItemText primary="Food Finder Map" />
           </ListItem>
         </Link>
       </List>
