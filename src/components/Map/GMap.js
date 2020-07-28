@@ -255,6 +255,13 @@ class GMap extends Component {
       .onSnapshot(snapshot => {
         let calendar = [];
 
+        if(!snapshot.size) {
+          alert('Unable to load map. Please try again later.')
+          this.setState({
+            loading: false,
+          });
+        }
+
         snapshot.forEach(event => {
           const eventData = event.data();
 
