@@ -136,9 +136,9 @@ class EventEdit extends Component {
           let formData = doc.data();
               formData.start_time = doc.data().start_time.toDate();
               formData.end_time = doc.data().end_time.toDate();
-              formData.recurring_start = doc.data().recurring_start ? doc.data().recurring_start.toDate() : formData.recurring_start;
-              formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : formData.recurring_end;
-              formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : formData.last_updated;
+              formData.recurring_start = doc.data().recurring_start ? doc.data().recurring_start.toDate() : this.state.formData.recurring_start;
+              formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : this.state.formData.recurring_end;
+              formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : this.state.formData.last_updated;
 
           console.log("Document data:", doc.data());
 
