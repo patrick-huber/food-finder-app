@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import React, { setState } from 'react';
 import { compose } from 'recompose';
 
-import * as ROLES from '../../constants/roles';
+import { Route } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 
 import { withAuthorization, withEmailVerification } from '../Session';
-import { EventList, EventView, EventEdit } from '../Events';
+import { EventList } from '../Events';
 
 import Footer from '../Footer';
 
@@ -62,6 +61,15 @@ const NewEventButton = () => (
 function EventsPage(props) {
   const classes = useStyles();
 
+  if(props.location.state) {
+    if(props.location.state.action && props.location.state.action) {
+      props.history.push({
+        state: { action: null }
+      });
+      alert('Event added successfully!');
+    }
+  }
+
   return (
     <React.Fragment>
       <CssBaseline />
@@ -79,20 +87,7 @@ function EventsPage(props) {
             </Grid>
           </div>
           <Paper elevation={0} className={classes.paperCallout}>
-            <Switch>
-              <Route exact path={ROUTES.EVENTS} render={(routeProps) => (
-                <EventList authUser={props.authUser} {...routeProps} />
-              )} />
-              <Route exact path={ROUTES.EVENT_VIEW} render={(routeProps) => (
-                <EventView authUser={props.authUser} {...routeProps} />
-              )} />
-              <Route exact path={ROUTES.EVENT_EDIT} render={(routeProps) => (
-                <EventEdit authUser={props.authUser} {...routeProps} />
-              )} />
-              <Route exact path={ROUTES.EVENT_NEW} render={(routeProps) => (
-                <EventEdit authUser={props.authUser} {...routeProps} />
-              )} />
-            </Switch>
+            <EventList authUser={props.authUser} {...props} />
           </Paper>
         </Container>
       </main>

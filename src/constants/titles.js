@@ -12,3 +12,5 @@ export const ADMIN_DETAILS = 'Admin Details | Vendor Portal';
 export const VENDOR = '/vendor';
 export const VENDOR_DETAILS = '/vendor/:id';
 export const EVENTS = 'Events | Vendor Portal';
+export const EVENT_NEW = 'New Event | Vendor Portal';
+export const EVENT_EDIT = 'Edit Event | Vendor Portal';

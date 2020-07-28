@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 
+import { Route } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 
-import { withFirebase } from '../Firebase';
+import { withAuthorization, withEmailVerification } from '../Session';
 
+import Footer from '../Footer';
+
+import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -41,6 +45,20 @@ import LocationSearchInput from '../PlacesAutocomplete';
 const styles = theme => ({
   root: {
     backgroundColor: "red"
+  },
+  appBarSpacer: theme.mixins.toolbar,
+  cardGrid: {
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8),
+  },
+  section: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+  },
+  paperCallout: {
+    marginTop: 30,
+    marginBottom: 20,
+    padding: 20,
   },
   paper: {
     display: 'flex',
@@ -247,19 +265,22 @@ class EventEdit extends Component {
       delete data.notes;
     }
 
-    this.addEventFirestore(data);
+    this.addEventFirestore(data, this);
   }
 
-  addEventFirestore = (eventData) => {
+  addEventFirestore = (eventData, scope) => {
     this.setState({updatingFirestore: true});
     this.props.firebase.calendar().add(eventData)
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
-        // handle route
+        scope.props.history.push({
+          pathname: ROUTES.EVENTS,
+          state: { action: 'new-event-success' }
+        });
       })
       .catch(function(error) {
-        this.setState({updatingFirestore: false});
-        alert("Error adding new event. Please reach out to support with these error details: ", error);
+        alert("Error adding new event. Please reach out to support with these error details: " + error);
+        scope.setState({updatingFirestore: false});
       });
   }
 
@@ -270,167 +291,182 @@ class EventEdit extends Component {
 
     return (
       <React.Fragment>
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <EventIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              {headerText}
-            </Typography>
-            <LocalizationProvider dateAdapter={DateFnsUtils}>
-              <form className={classes.form}>
+      <CssBaseline />
+      <div className={classes.appBarSpacer} />
+      <main>
+        <Container className={classes.section} maxWidth="md">
+          <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
+            Events
+          </Typography>
+          <Paper elevation={0} className={classes.paperCallout}>
+              <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <div className={classes.paper}>
+                  <Avatar className={classes.avatar}>
+                    <EventIcon />
+                  </Avatar>
+                  <Typography component="h1" variant="h5">
+                    {headerText}
+                  </Typography>
+                  <LocalizationProvider dateAdapter={DateFnsUtils}>
+                    <form className={classes.form}>
 
-                
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={12}>
-                    <FormControl required fullWidth component="fieldset">
-                      <RadioGroup row aria-label="one time or recurring event" name="recurring" value={recurring} onChange={(e, value) => {this.handleRecurringChange(value)}}>
-                        <FormControlLabel value="no" control={<Radio />} label="One Time" />
-                        <FormControlLabel value="yes" control={<Radio />} label="Recurring" />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
-                  </Grid>
-                  {recurring === "no" &&
-                  <Grid item xs={12} sm={12}>
-                    <DatePicker
-                      disablePast
-                      id="start-date-picker"
-                      label="Date"
-                      value={formData.start_time}
-                      onChange={(value) => {this.handleStartDateChange(value)}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change event date',
-                      }}
-                      renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
-                    />
-                  </Grid>
-                  } {recurring === "yes" &&
-                    <React.Fragment>
-                      <Grid item xs={12} sm={6}>
-                        <DatePicker
-                          disablePast
-                          id="recurring-start-date-picker"
-                          label="First Day"
-                          value={formData.start_time}
-                          onChange={(value) => {this.handleStartDateChange(value)}}
-                          KeyboardButtonProps={{
-                            'aria-label': 'change recurring start date',
-                          }}
-                          renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
-                        />
+                      
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12}>
+                          <FormControl required fullWidth component="fieldset">
+                            <RadioGroup row aria-label="one time or recurring event" name="recurring" value={recurring} onChange={(e, value) => {this.handleRecurringChange(value)}}>
+                              <FormControlLabel value="no" control={<Radio />} label="One Time" />
+                              <FormControlLabel value="yes" control={<Radio />} label="Recurring" />
+                            </RadioGroup>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
+                        </Grid>
+                        {recurring === "no" &&
+                        <Grid item xs={12} sm={12}>
+                          <DatePicker
+                            disablePast
+                            id="start-date-picker"
+                            label="Date"
+                            value={formData.start_time}
+                            onChange={(value) => {this.handleStartDateChange(value)}}
+                            KeyboardButtonProps={{
+                              'aria-label': 'change event date',
+                            }}
+                            renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                          />
+                        </Grid>
+                        } {recurring === "yes" &&
+                          <React.Fragment>
+                            <Grid item xs={12} sm={6}>
+                              <DatePicker
+                                disablePast
+                                id="recurring-start-date-picker"
+                                label="First Day"
+                                value={formData.start_time}
+                                onChange={(value) => {this.handleStartDateChange(value)}}
+                                KeyboardButtonProps={{
+                                  'aria-label': 'change recurring start date',
+                                }}
+                                renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DatePicker
+                                disablePast
+                                id="recurring-end-date-picker"
+                                label="Last Day"
+                                value={formData.recurring_end}
+                                minDate={formData.start_time}
+                                onChange={(value) => {this.handleRecurringEndDateChange(value)}}
+                                KeyboardButtonProps={{
+                                  'aria-label': 'change recurring end date',
+                                }}
+                                renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
+                              />
+                            </Grid>
+                          </React.Fragment>
+                        }
+                        <Grid item xs={12} sm={6}>
+                          <TimePicker
+                            id="start-time-picker"
+                            label="Opening time"
+                            value={formData.start_time}
+                            onChange={(value) => {this.handleStartDateChange(value)}}
+                            KeyboardButtonProps={{
+                              'aria-label': 'change opening time',
+                            }}
+                            renderInput={props => <TextField {...props} error={errorEndTime} helperText={null} required fullWidth variant="outlined" />}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TimePicker
+                            id="end-time-picker"
+                            label="Closing time"
+                            value={formData.end_time}
+                            onChange={(value) => {this.handleEndHourChange(value)}}
+                            KeyboardButtonProps={{
+                              'aria-label': 'change closing time',
+                            }}
+                            renderInput={props => <TextField {...props} error={errorEndTime} helperText={errorEndTimeText} required fullWidth variant="outlined"  />}
+                          />
+                        </Grid>
+                        {recurring === "yes" &&
+                          <Grid item xs={12} sm={6}>
+                            <FormControl component="fieldset">
+                              <FormLabel component="legend">Days</FormLabel>
+                              <FormGroup>
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(1)} onChange={(e, value) => {this.handleDayChange(value,1)}} name="Monday" />}
+                                  label="Monday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(2)} onChange={(e, value) => {this.handleDayChange(value,2)}} name="Tuesday" />}
+                                  label="Tuesday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(3)} onChange={(e, value) => {this.handleDayChange(value,3)}} name="Wednesday" />}
+                                  label="Wednesday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(4)} onChange={(e, value) => {this.handleDayChange(value,4)}} name="Thursday" />}
+                                  label="Thursday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(5)} onChange={(e, value) => {this.handleDayChange(value,5)}} name="Friday" />}
+                                  label="Friday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(6)} onChange={(e, value) => {this.handleDayChange(value,6)}} name="Saturday" />}
+                                  label="Saturday"
+                                />
+                                <FormControlLabel
+                                  control={<Checkbox checked={daysSet.has(0)} onChange={(e, value) => {this.handleDayChange(value,0)}} name="Sunday" />}
+                                  label="Sunday"
+                                />
+                              </FormGroup>
+                            </FormControl>
+                          </Grid>
+                        }
+                        <Grid item xs={12} sm={12}>
+                          <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <DatePicker
-                          disablePast
-                          id="recurring-end-date-picker"
-                          label="Last Day"
-                          value={formData.recurring_end}
-                          minDate={formData.start_time}
-                          onChange={(value) => {this.handleRecurringEndDateChange(value)}}
-                          KeyboardButtonProps={{
-                            'aria-label': 'change recurring end date',
-                          }}
-                          renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
-                        />
-                      </Grid>
-                    </React.Fragment>
-                  }
-                  <Grid item xs={12} sm={6}>
-                    <TimePicker
-                      id="start-time-picker"
-                      label="Opening time"
-                      value={formData.start_time}
-                      onChange={(value) => {this.handleStartDateChange(value)}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change opening time',
-                      }}
-                      renderInput={props => <TextField {...props} error={errorEndTime} helperText={null} required fullWidth variant="outlined" />}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TimePicker
-                      id="end-time-picker"
-                      label="Closing time"
-                      value={formData.end_time}
-                      onChange={(value) => {this.handleEndHourChange(value)}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change closing time',
-                      }}
-                      renderInput={props => <TextField {...props} error={errorEndTime} helperText={errorEndTimeText} required fullWidth variant="outlined"  />}
-                    />
-                  </Grid>
-                  {recurring === "yes" &&
-                    <Grid item xs={12} sm={6}>
-                      <FormControl component="fieldset">
-                        <FormLabel component="legend">Days</FormLabel>
-                        <FormGroup>
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(1)} onChange={(e, value) => {this.handleDayChange(value,1)}} name="Monday" />}
-                            label="Monday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(2)} onChange={(e, value) => {this.handleDayChange(value,2)}} name="Tuesday" />}
-                            label="Tuesday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(3)} onChange={(e, value) => {this.handleDayChange(value,3)}} name="Wednesday" />}
-                            label="Wednesday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(4)} onChange={(e, value) => {this.handleDayChange(value,4)}} name="Thursday" />}
-                            label="Thursday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(5)} onChange={(e, value) => {this.handleDayChange(value,5)}} name="Friday" />}
-                            label="Friday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(6)} onChange={(e, value) => {this.handleDayChange(value,6)}} name="Saturday" />}
-                            label="Saturday"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={daysSet.has(0)} onChange={(e, value) => {this.handleDayChange(value,0)}} name="Sunday" />}
-                            label="Sunday"
-                          />
-                        </FormGroup>
-                      </FormControl>
-                    </Grid>
-                  }
-                  <Grid item xs={12} sm={12}>
-                    <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
-                  </Grid>
-                </Grid>
-                <div className={classes.submitWrapper}>
-                  <Button
-                    type="submit"
-                    disabled={errorEndTime || updatingFirestore}
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={(event) => {this.submitForm(event)}}
-                  >
-                    Create Event
-                  </Button>
-                  {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
+                      <div className={classes.submitWrapper}>
+                        <Button
+                          type="submit"
+                          disabled={errorEndTime || updatingFirestore}
+                          fullWidth
+                          variant="contained"
+                          color="primary"
+                          className={classes.submit}
+                          onClick={(event) => {this.submitForm(event)}}
+                        >
+                          Create Event
+                        </Button>
+                        {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
+                      </div>
+                      {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
+                    </form>
+                  </LocalizationProvider>
                 </div>
-                {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
-              </form>
-            </LocalizationProvider>
-          </div>
-        </Container>
-        {loading && <div>Loading ...</div>}
+              </Container>
+              {loading && <div>Loading ...</div>}
+            </Paper>
+          </Container>
+        </main>
+        <Footer />
       </React.Fragment>
     );
   }
 }
 
+const condition = authUser => !!authUser;
+
 export default compose(
   withStyles(styles, { withTheme: true }),
-  withFirebase,
+  withEmailVerification,
+  withAuthorization(condition),
 )(EventEdit);

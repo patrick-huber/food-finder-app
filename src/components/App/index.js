@@ -9,7 +9,7 @@ import Header from '../Header';
 import LandingPage from '../Landing';
 import AboutPage from '../About';
 import { VendorPage } from '../Vendors';
-import { EventsPage } from '../Events';
+import { EventsPage, EventEdit } from '../Events';
 import SupportPage from '../Support';
 import SignUpPage from '../SignUp';
 import SignInPage from '../SignIn';
@@ -74,10 +74,28 @@ function App (props) {
           )}
         />
         <Route
+          exact
           path={ROUTES.EVENTS}
           render={() => (
             <Page title={ROUTE_TITLES.EVENTS} firebase={props.firebase} >
               <EventsPage />
+            </Page>
+          )}
+        />
+        <Route
+          path={ROUTES.EVENT_EDIT}
+          render={() => (
+            <Page title={ROUTE_TITLES.EVENT_EDIT} firebase={props.firebase} >
+              <EventEdit />
+            </Page>
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.EVENT_NEW}
+          render={() => (
+            <Page title={ROUTE_TITLES.EVENT_NEW} firebase={props.firebase} >
+              <EventEdit />
             </Page>
           )}
         />
