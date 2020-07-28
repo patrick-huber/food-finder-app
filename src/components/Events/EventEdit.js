@@ -7,6 +7,7 @@ import * as ROUTES from '../../constants/routes';
 import { withAuthorization, withEmailVerification } from '../Session';
 
 import Footer from '../Footer';
+import { Fullscreen } from '../Loading';
 
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
@@ -100,7 +101,7 @@ class EventEdit extends Component {
       errorMissing: false,
       errorEndTime: false,
       errorEndTimeText: null,
-      newEvent: false,
+      newEvent: true,
       event: null,
       recurring: "no",
       daysSet: new Set(),
@@ -115,32 +116,45 @@ class EventEdit extends Component {
         days: [],
         notes: null,
         last_updated: today,
-      },
-      ...props.location.state,
+      }
     };
   }
 
   componentDidMount() {
-    if(this.props.match.path === ROUTES.EVENT_NEW) {
-      return this.setState({
-        newEvent: true,
-      });
-    }
-
-    if (this.state.event) {
-      return;
-    }
+    if(this.props.match.path === ROUTES.EVENT_NEW) return;
 
     this.setState({ loading: true });
 
-    this.unsubscribe = this.props.firebase
+    this.props.firebase
       .calendarDetails(this.props.match.params.id)
-      .onSnapshot(snapshot => {
-        this.setState({
-          event: snapshot.data(),
-          formData: snapshot.data(),
-          loading: false,
-        });
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          // Check for recurring event and format firestore dates
+          const recurring = doc.data().recurring_start ? "yes" : "no";
+          const daysSet = new Set(doc.data().days);
+          let formData = doc.data();
+              formData.start_time = doc.data().start_time.toDate();
+              formData.end_time = doc.data().end_time.toDate();
+              formData.recurring_start = doc.data().recurring_start.toDate();
+              formData.recurring_end = doc.data().recurring_end.toDate();
+              formData.last_updated = doc.data().last_updated.toDate();
+
+          console.log("Document data:", doc.data());
+
+          this.setState({
+            event: doc.data(),
+            formData: formData,
+            loading: false,
+            recurring: recurring,
+            daysSet: daysSet,
+          });
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      }).catch(function(error) {
+          console.log("Error getting document:", error);
       });
   }
 
@@ -308,10 +322,11 @@ class EventEdit extends Component {
                   <Typography component="h1" variant="h5">
                     {headerText}
                   </Typography>
+                  {loading &&
+                    <Fullscreen />
+                  }
                   <LocalizationProvider dateAdapter={DateFnsUtils}>
                     <form className={classes.form}>
-
-                      
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={12}>
                           <FormControl required fullWidth component="fieldset">
@@ -322,7 +337,7 @@ class EventEdit extends Component {
                           </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                          <LocationSearchInput valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
+                          <LocationSearchInput defaultValue={formData.address} valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
                         </Grid>
                         {recurring === "no" &&
                         <Grid item xs={12} sm={12}>
@@ -453,7 +468,6 @@ class EventEdit extends Component {
                   </LocalizationProvider>
                 </div>
               </Container>
-              {loading && <div>Loading ...</div>}
             </Paper>
           </Container>
         </main>

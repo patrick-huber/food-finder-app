@@ -24,9 +24,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GoogleMaps(props) {
   const classes = useStyles();
-  const [value, setValue] = React.useState(null);
+  const [value, setValue] = React.useState(props.defaultValue);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    setValue(props.defaultValue)
+  },[props.defaultValue]);
 
   const fetch = React.useMemo(
     () =>
