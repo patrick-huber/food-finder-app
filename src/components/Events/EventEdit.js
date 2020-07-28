@@ -136,13 +136,14 @@ class EventEdit extends Component {
           let formData = doc.data();
               formData.start_time = doc.data().start_time.toDate();
               formData.end_time = doc.data().end_time.toDate();
-              formData.recurring_start = doc.data().recurring_start.toDate();
-              formData.recurring_end = doc.data().recurring_end.toDate();
-              formData.last_updated = doc.data().last_updated.toDate();
+              formData.recurring_start = doc.data().recurring_start ? doc.data().recurring_start.toDate() : formData.recurring_start;
+              formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : formData.recurring_end;
+              formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : formData.last_updated;
 
           console.log("Document data:", doc.data());
 
           this.setState({
+            newEvent: false,
             event: doc.data(),
             formData: formData,
             loading: false,
@@ -459,7 +460,7 @@ class EventEdit extends Component {
                           className={classes.submit}
                           onClick={(event) => {this.submitForm(event)}}
                         >
-                          Create Event
+                          {newEvent ? 'Create Event': 'Edit Event'}
                         </Button>
                         {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </div>
