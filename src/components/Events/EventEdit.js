@@ -22,6 +22,7 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { set, setMinutes, getMinutes, setHours, getHours, startOfDay, addDays } from 'date-fns';
 
@@ -57,6 +58,17 @@ const styles = theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  submitWrapper: {
+    margin: theme.spacing(1),
+    position: 'relative',
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
 });
 
 class EventEdit extends Component {
@@ -66,6 +78,7 @@ class EventEdit extends Component {
 
     this.state = {
       loading: false,
+      updatingFirestore: false,
       errorMissing: false,
       errorEndTime: false,
       errorEndTimeText: null,
@@ -238,17 +251,20 @@ class EventEdit extends Component {
   }
 
   addEventFirestore = (eventData) => {
+    this.setState({updatingFirestore: true});
     this.props.firebase.calendar().add(eventData)
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
+        // handle route
       })
       .catch(function(error) {
-        console.error("Error adding document: ", error);
+        this.setState({updatingFirestore: false});
+        alert("Error adding new event. Please reach out to support with these error details: ", error);
       });
   }
 
   render() {
-    const { newEvent, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
+    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
@@ -389,17 +405,20 @@ class EventEdit extends Component {
                     <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
                   </Grid>
                 </Grid>
-                <Button
-                  type="submit"
-                  disabled={errorEndTime}
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  onClick={(event) => {this.submitForm(event)}}
-                >
-                  Create Event
-                </Button>
+                <div className={classes.submitWrapper}>
+                  <Button
+                    type="submit"
+                    disabled={errorEndTime || updatingFirestore}
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    onClick={(event) => {this.submitForm(event)}}
+                  >
+                    Create Event
+                  </Button>
+                  {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </div>
                 {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
               </form>
             </LocalizationProvider>
