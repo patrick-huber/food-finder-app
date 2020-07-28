@@ -39,7 +39,10 @@ class ActionsMenu extends Component {
     this.setState({anchorEl: event.currentTarget});
   };
 
-  handleClose = () => {
+  handleClose = (action) => {
+    if(action) {
+      this.props.selectAction(this.state.index, action);
+    }
     this.setState({anchorEl: null});
   };
 
@@ -62,49 +65,51 @@ class ActionsMenu extends Component {
           open={Boolean(anchorEl)}
           onClick={() => {this.handleClose()}}
         >
-          <MenuItem onClick={() => {this.handleClose()}}>Edit</MenuItem>
-          <MenuItem onClick={() => {this.handleClose()}}>Delete</MenuItem>
+          <MenuItem onClick={() => {this.handleClose('Edit')}}>Edit</MenuItem>
+          <MenuItem onClick={() => {this.handleClose('Delete')}}>Delete</MenuItem>
         </Menu>
       </div>
     )
   }
 }
 
-const columns = [
- {
-  name: "date",
-  label: "Date",
-  options: {
-   filter: true,
-   sort: true,
-  }
- },
- {
-  name: "address",
-  label: "Location",
-  options: {
-   filter: true,
-   sort: true,
-  }
- },
- {
-  name: "Actions",
-  options: {
-    filter: false,
-    sort: false,
-    empty: true,
-    customBodyRenderLite: (dataIndex) => {
-      return (
-        <ActionsMenu index={dataIndex} />
-      )
-    }
-  }
- }
-];
-const options = {
-};
+function getDayString(dayValue) {
+  let weekday=new Array(7);
+  weekday[0]="Sunday";
+  weekday[1]="Monday";
+  weekday[2]="Tuesday";
+  weekday[3]="Wednesday";
+  weekday[4]="Thursday";
+  weekday[5]="Friday";
+  weekday[6]="Saturday";
 
-class Events extends Component {
+  return weekday[dayValue];
+}
+function convertDaysArrayToString(daysArray) {
+  let firstDay = true;
+  var daysString = '';
+
+  daysArray.map(day => {
+    if(firstDay) {
+      daysString += getDayString(day) + 's';
+      firstDay = false;
+    } else {
+      daysString += ', ' + getDayString(day) + 's';
+    }
+  });
+  return daysString;
+}
+function convertDaysValuesToStrings(daysArray) {
+  var daysStringArray = [];
+
+  daysArray.map(day => {
+    daysStringArray.push(getDayString(day));
+  });
+
+  return daysStringArray;
+}
+
+class EventsList extends Component {
   constructor(props) {
     super(props);
 
@@ -129,9 +134,17 @@ class Events extends Component {
 
           snapshot.forEach(doc => {
             events.push({ ...doc.data(), uid: doc.id });
+
+            const recurring_end = doc.data().recurring_end ? format(doc.data().recurring_end.toDate(), 'P') : null;
+            const days = doc.data().days ? convertDaysValuesToStrings(doc.data().days) : null;
+
             tableData.push({
               address: doc.data().address,
-              date: format(doc.data().start_time.toDate(), 'PPPPpp'),
+              date: format(doc.data().start_time.toDate(), 'P'),
+              open: format(doc.data().start_time.toDate(), 'p'),
+              close: format(doc.data().end_time.toDate(), 'p'),
+              recurring_end: recurring_end,
+              days: days,
             });
           }, err => {
             alert('Unable to load events. Please try again later.')
@@ -159,6 +172,78 @@ class Events extends Component {
 
   render() {
     const { text, events, tableData, loading } = this.state;
+    const columns = [
+     {
+      name: "date",
+      label: "Date",
+      options: {
+        filter: true,
+        sort: true,
+      }
+     },
+     {
+      name: "recurring_end",
+      label: "Recurring End",
+      options: {
+        filter: true,
+        sort: true,
+      }
+     },
+     {
+      name: "open",
+      label: "Opening Time",
+      options: {
+        filter: true,
+        sort: true,
+      }
+     },
+     {
+      name: "close",
+      label: "Closing Time",
+      options: {
+        filter: true,
+        sort: true,
+      }
+     },
+     {
+      name: "address",
+      label: "Location",
+      options: {
+        filter: true,
+        sort: true,
+      }
+     },
+     {
+      name: "days",
+      label: "Days",
+      options: {
+        filter: true,
+        filterType: 'multiselect',
+        customBodyRenderLite: (dataIndex) => {
+          let value = tableData[dataIndex].days ? tableData[dataIndex].days : [];
+          return value.map( (val, key) => {
+            return <span key={key}>{val}s </span>;
+          });
+        },
+      }
+     },
+     {
+      name: "",
+      options: {
+        filter: false,
+        sort: false,
+        empty: true,
+        customBodyRenderLite: (dataIndex) => {
+          return (
+            <ActionsMenu index={dataIndex} selectAction={(dataIndex, action) => {console.log(tableData[dataIndex], action)}} />
+          )
+        }
+      }
+     }
+    ];
+    const options = {
+      selectableRows: 'none',
+    };
 
     return (
       <div>
@@ -184,4 +269,4 @@ const condition = authUser => !!authUser;
 export default compose(
   withStyles(styles, { withTheme: true }),
   withAuthorization(condition),
-)(Events);
+)(EventsList);
