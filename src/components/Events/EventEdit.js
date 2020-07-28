@@ -341,8 +341,8 @@ class EventEdit extends Component {
         <main>
           <Container className={classes.section} maxWidth="sm">
             <Toolbar>
-              <IconButton edge="start" color="inherit" aria-label="previous page">
-                <ArrowBackIcon onClick={() => { this.props.history.goBack() }} />
+              <IconButton edge="start" color="inherit" aria-label="previous page" onClick={() => { this.props.history.goBack() }} >
+                <ArrowBackIcon/>
               </IconButton>
             </Toolbar>
             <Paper elevation={0} className={classes.paperCallout}>
