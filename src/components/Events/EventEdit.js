@@ -22,7 +22,7 @@ import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 
-import { set, setMinutes, getMinutes, setHours, getHours, startOfDay } from 'date-fns';
+import { set, setMinutes, getMinutes, setHours, getHours, startOfDay, addDays } from 'date-fns';
 
 import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import {
@@ -146,7 +146,7 @@ class EventEdit extends Component {
   handleEndDateChange = (time) => {
     let formData = this.state.formData;
         formData['end_time'] = time;
-        formData['recurring_end'] = time;
+        formData['recurring_end'] = startOfDay(time);
 
     let tempEndTime = setHours(formData.start_time, getHours(time));
         tempEndTime = setMinutes(tempEndTime, getMinutes(time));
@@ -193,6 +193,21 @@ class EventEdit extends Component {
     this.setState( {
       formData: newFormData,
     });
+  }
+
+  submitForm = () => {
+    // Form validation
+    let data = this.state.formData;
+
+    // Add one day to last recurring day to account for final day
+    data['recurring_end'] = addDays(data.recurring_end, 1);
+
+    // remove recurring fields for one-time event
+    if(this.state.recurring === "no") {
+      data['recurring_end'] = null;
+      data['recurring_start'] = null;
+      data['days'] = null;
+    }
   }
 
   render() {
@@ -245,7 +260,7 @@ class EventEdit extends Component {
                         <DatePicker
                           disablePast
                           id="recurring-start-date-picker"
-                          label="Start Date"
+                          label="First Day"
                           value={formData.start_time}
                           onChange={(value) => {this.handleStartDateChange(value)}}
                           KeyboardButtonProps={{
@@ -259,7 +274,7 @@ class EventEdit extends Component {
                           disablePast
                           minDate={formData.start_time}
                           id="recurring-end-date-picker"
-                          label="End Date"
+                          label="Last Day"
                           value={formData.end_time}
                           onChange={(value) => {this.handleEndDateChange(value)}}
                           KeyboardButtonProps={{
@@ -338,6 +353,7 @@ class EventEdit extends Component {
                 </Grid>
                 <Button
                   type="submit"
+                  disabled={errorEndTime}
                   fullWidth
                   variant="contained"
                   color="primary"
