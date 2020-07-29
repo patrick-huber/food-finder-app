@@ -72,7 +72,7 @@ class ActionsMenu extends Component {
     const { anchorEl, index } = this.state;
     return (
       <div>
-        <Hidden smDown>
+        <Hidden xsDown>
           <IconButton
             aria-label="more"
             aria-controls="long-menu"
@@ -102,7 +102,7 @@ class ActionsMenu extends Component {
             </MenuItem>
           </Menu>
         </Hidden>
-        <Hidden mdUp>
+        <Hidden smUp>
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <Button
@@ -324,6 +324,9 @@ class EventsList extends Component {
     ];
     const options = {
       selectableRows: 'none',
+      download: false,
+      viewColumns: false,
+      responsive: 'simple',
     };
 
     return (
