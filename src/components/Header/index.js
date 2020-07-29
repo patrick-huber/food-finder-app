@@ -10,6 +10,7 @@ import * as ROLES from '../../constants/roles';
 import FoodFinderLogo from '../SVG/food-finder-logo.svg';
 
 import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -25,6 +26,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import RoomIcon from '@material-ui/icons/Room';
 import ReportProblemIcon from '@material-ui/icons/ReportProblem';
+
+import { SetVendor } from '../Vendors';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,106 +96,123 @@ export default function Header() {
   );
 
   const NavigationAuth = ({ authUser }) => ( 
-    <div> 
-      <List className={clsx(classes.menuList)} component="nav" aria-label="Primary nav">
-        <Link to={ROUTES.EVENTS}>
-          <ListItem
-            button
-          >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Events" />
-          </ListItem>
-        </Link>
-        <Link to={ROUTES.ACCOUNT}>
-          <ListItem
-            button
-          >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Profile" />
-          </ListItem>
-        </Link>
-        {!!authUser.roles[ROLES.ADMIN] && (
-        <Link to={ROUTES.ADMIN}>
-          <ListItem
-            button
-          >
-            <ListItemIcon></ListItemIcon>
-            <ListItemText primary="Admin" />
-          </ListItem>
-        </Link>
-        )}
-        <Link to={ROUTES.ACCOUNT}>
-          <ListItem
-            button
-          >
-            <ListItemIcon></ListItemIcon>
-            <SignOutButton />
-          </ListItem>
-        </Link>
+    <div>
+      <Container maxWidth="sm">
+        <SetVendor />
+      </Container>
+      <div
+        className={clsx(classes.list)}
+        role="presentation"
+        onClick={handleDrawerClose}
+        onKeyDown={handleDrawerClose}
+      >
+        <List className={clsx(classes.menuList)} component="nav" aria-label="Primary nav">
+          <Link to={ROUTES.EVENTS}>
+            <ListItem
+              button
+            >
+              <ListItemIcon></ListItemIcon>
+              <ListItemText primary="Events" />
+            </ListItem>
+          </Link>
+          <Link to={ROUTES.ACCOUNT}>
+            <ListItem
+              button
+            >
+              <ListItemIcon></ListItemIcon>
+              <ListItemText primary="Profile" />
+            </ListItem>
+          </Link>
+          {!!authUser.roles[ROLES.ADMIN] && (
+          <Link to={ROUTES.ADMIN}>
+            <ListItem
+              button
+            >
+              <ListItemIcon></ListItemIcon>
+              <ListItemText primary="Admin" />
+            </ListItem>
+          </Link>
+          )}
+          <Link to={ROUTES.ACCOUNT}>
+            <ListItem
+              button
+            >
+              <ListItemIcon></ListItemIcon>
+              <SignOutButton />
+            </ListItem>
+          </Link>
 
-        <Divider />
-        <Link to={ROUTES.LANDING}>
-          <ListItem
-            button
-          >
-            <ListItemIcon>
-              <RoomIcon />
-            </ListItemIcon>
-            <ListItemText primary="Food Finder Map" />
-          </ListItem>
-        </Link>
-      </List>
-    </div>
+          <Divider />
+          <Link to={ROUTES.LANDING}>
+            <ListItem
+              button
+            >
+              <ListItemIcon>
+                <RoomIcon />
+              </ListItemIcon>
+              <ListItemText primary="Food Finder Map" />
+            </ListItem>
+          </Link>
+        </List>
+      </div>
+    </div> 
   );
 
   const NavigationNonAuth = () => (
     <div>
-      <List component="nav" aria-label="Primary nav">
-        <Link className={clsx(classes.menuLink)} to={ROUTES.LANDING}>
+      <div
+        className={clsx(classes.list)}
+        role="presentation"
+        onClick={handleDrawerClose}
+        onKeyDown={handleDrawerClose}
+      >
+        <List component="nav" aria-label="Primary nav">
+          <Link className={clsx(classes.menuLink)} to={ROUTES.LANDING}>
+            <ListItem
+              button
+              selected
+            >
+              <ListItemIcon>
+                <RoomIcon className={clsx(classes.mapIcon)} />
+              </ListItemIcon>
+              <ListItemText primary="Food Finder Map" />
+            </ListItem>
+          </Link>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.VENDORS}>
+            <ListItem
+              button
+            >
+              <ListItemText inset primary="Vendors" />
+            </ListItem>
+          </Link>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.SUPPORT}>
+            <ListItem
+              button
+            >
+              <ListItemText inset primary="Support & Contact" />
+            </ListItem>
+          </Link>
+          <Divider />
           <ListItem
             button
-            selected
+            onClick={() => window.open('https://forms.gle/14XSLARoKh9CBYB8A')}
           >
             <ListItemIcon>
-              <RoomIcon className={clsx(classes.mapIcon)} />
+              <ReportProblemIcon />
             </ListItemIcon>
-            <ListItemText primary="Food Finder Map" />
+            <ListItemText primary="Report Bad Info" />
           </ListItem>
-        </Link>
-        <Link className={clsx(classes.menuLink)} to={ROUTES.VENDORS}>
-          <ListItem
-            button
-          >
-            <ListItemText inset primary="Vendors" />
-          </ListItem>
-        </Link>
-        <Link className={clsx(classes.menuLink)} to={ROUTES.SUPPORT}>
-          <ListItem
-            button
-          >
-            <ListItemText inset primary="Support & Contact" />
-          </ListItem>
-        </Link>
-        <Divider />
-        <ListItem
-          button
-          onClick={() => window.open('https://forms.gle/14XSLARoKh9CBYB8A')}
-        >
-          <ListItemIcon>
-            <ReportProblemIcon />
-          </ListItemIcon>
-          <ListItemText primary="Report Bad Info" />
-        </ListItem>
-        <Divider />
+          <Divider />
 
-        <Link className={clsx(classes.menuLink)} to={ROUTES.SIGN_IN}>
-          <ListItem
-            button
-          >
-            <ListItemText inset primary="Vendor Sign In" />
-          </ListItem>
-        </Link>
-      </List>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.SIGN_IN}>
+            <ListItem
+              button
+            >
+              <ListItemText inset primary="Vendor Sign In" />
+            </ListItem>
+          </Link>
+        </List>
+      </div>
     </div>
   );
 
@@ -222,14 +242,7 @@ export default function Header() {
             <CloseIcon />
           </IconButton>
         </Toolbar>
-        <div
-          className={clsx(classes.list)}
-          role="presentation"
-          onClick={handleDrawerClose}
-          onKeyDown={handleDrawerClose}
-        >
-          <Navigation />
-        </div>
+        <Navigation />
       </Drawer>
     </div>
   );
