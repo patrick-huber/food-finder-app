@@ -255,17 +255,19 @@ class GMap extends Component {
       .onSnapshot(snapshot => {
         let calendar = [];
 
+        if(!snapshot.size) {
+          alert('Unable to load map. Please try again later.')
+          this.setState({
+            loading: false,
+          });
+        }
+
         snapshot.forEach(event => {
           const eventData = event.data();
 
           if(eventData.recurring_start) {
             if(eventData.recurring_end.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
           } else if(eventData.end_time.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
-        }, err => {
-          alert('Unable to load map. Please try again later.')
-          this.setState({
-            loading: false,
-          });
         });
 
         if(this.state.loading) {
@@ -281,7 +283,11 @@ class GMap extends Component {
             fullCalendar: calendar,
           });
         }
-
+      }, err => {
+        alert('Unable to load map. Please try again later.')
+        this.setState({
+          loading: false,
+        });
       });
   }
 

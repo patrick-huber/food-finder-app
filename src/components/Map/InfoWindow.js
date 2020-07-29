@@ -78,6 +78,7 @@ export default function InfoWindow(props) {
   const infoData = props.infoData;
   const [modalOpen, setModalOpen] = useState(false);
   const firebase = props.firebase;
+  const websiteString = infoData.website ? infoData.website.slice(infoData.website.search('//') + 2) : null;
 
   useEffect(() => {
     props.onRender((observed.current.clientHeight === 0) ? 300 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
@@ -170,7 +171,7 @@ export default function InfoWindow(props) {
                 <CompactListItemIcon>
                   <LanguageIcon />
                 </CompactListItemIcon>
-                <ListItemText primary={infoData.website} />
+                <ListItemText primary={websiteString} />
               </CompactListItem>
             }{infoData.menu &&
               <CompactListItem alignItems={'flex-start'} key="menu" button onClick={() => openMenu(infoData.menu)}>
