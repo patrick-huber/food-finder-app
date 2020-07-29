@@ -317,9 +317,9 @@ class EventsList extends Component {
         filter: false,
         sort: false,
         empty: true,
-        customBodyRenderLite: (dataIndex) => {
+        customBodyRenderLite: (dataIndex, rowIndex) => {
           return (
-            <ActionsMenu index={dataIndex} selectAction={(dataIndex, action) => {this.onActionSelect(tableData[dataIndex].uid, action)}} />
+            <ActionsMenu index={dataIndex} selectAction={(rowIndex, action) => {this.onActionSelect(tableData[dataIndex].uid, action)}} />
           )
         }
       }
