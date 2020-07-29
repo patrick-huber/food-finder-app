@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 
+import * as ROUTES from '../../constants/routes';
+
 import { withAuthorization } from '../Session';
 
 import { withStyles } from "@material-ui/core/styles";
@@ -64,7 +66,7 @@ class SetVendor extends Component {
         vendor: vendorId,
       })
       .then(() => {
-        alert("User vendor updated. Refresh page to load new data.");
+        this.props.history.push(ROUTES.EVENTS);
         window.location.reload(true);
       })
       .catch((error) => {

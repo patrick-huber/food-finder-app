@@ -178,6 +178,7 @@ class EventsList extends Component {
       loading: false,
       events: [],
       tableData: [],
+      vendor: '',
     };
   }
 
@@ -185,11 +186,32 @@ class EventsList extends Component {
     const vendor = this.props.authUser.vendor;
     this.setState({
       loading: true,
+      vendor: this.props.authUser.vendor,
+    },() => {
+      this.loadEvents();
     });
+  }
 
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // Reset firestore data when vendor switched
+    if(this.state.vendor !== nextProps.authUser.vendor){
+      this.setState({vendor: nextProps.authUser.vendor},() => {
+        this.loadEvents();
+      });
+    }
+    return true;
+  }
+
+  loadEvents = () => {
+    console.log('loadEvents')
+    console.log(this)
     this.unsubscribe = this.props.firebase
       .calendar()
-      .where('vendor', '==', vendor)
+      .where('vendor', '==', this.state.vendor)
       .onSnapshot(snapshot => {
         if(snapshot.size) {
           let events = [];
@@ -228,12 +250,7 @@ class EventsList extends Component {
         } else {
           this.setState({ events: null, loading: false });
         }
-
       });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
   }
 
   deleteEvent = (eventId) => {
