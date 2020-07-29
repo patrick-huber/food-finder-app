@@ -261,7 +261,7 @@ class EventEdit extends Component {
 
     // Validation
     for (const [key, value] of Object.entries(data)) {
-      if(!value && key !== 'notes') {
+      if(!value && key !== 'notes' && key !== 'days') {
         console.log('missing field: '+ key)
         return this.setState({errorMissing: true});
       }
