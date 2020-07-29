@@ -12,7 +12,7 @@ import { Spinner } from '../Loading';
 
 import MUIDataTable from "mui-datatables";
 
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
@@ -198,7 +198,7 @@ class EventsList extends Component {
           snapshot.forEach(doc => {
             events.push({ ...doc.data(), uid: doc.id });
 
-            const recurring_end = doc.data().recurring_end ? format(doc.data().recurring_end.toDate(), 'P') : null;
+            const recurring_end = doc.data().recurring_end ? format(addDays(doc.data().recurring_end.toDate(), -1), 'P') : null;
             const days = doc.data().days ? convertDaysValuesToStrings(doc.data().days) : null;
 
             tableData.push({
@@ -305,7 +305,7 @@ class EventsList extends Component {
      },
      {
       name: "recurring_end",
-      label: "Recurring End",
+      label: "Final Day",
       options: {
         filter: true,
         sort: true,
