@@ -202,15 +202,6 @@ export default function Header() {
             </ListItemIcon>
             <ListItemText primary="Report Bad Info" />
           </ListItem>
-          <Divider />
-
-          <Link className={clsx(classes.menuLink)} to={ROUTES.SIGN_IN}>
-            <ListItem
-              button
-            >
-              <ListItemText inset primary="Vendor Sign In" />
-            </ListItem>
-          </Link>
         </List>
       </div>
     </div>
