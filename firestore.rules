@@ -39,8 +39,7 @@ service cloud.firestore {
 
     match /calendar/{eventId} {
       allow get, list;
-      allow create: if isAdmin() || signedIn() && request.resource.data.vendor == request.auth.vendor;
-      allow update, delete: if isAdmin() || isCalendarOwner();
+      allow create, update, delete: if signedIn();
     }
   }
 }
