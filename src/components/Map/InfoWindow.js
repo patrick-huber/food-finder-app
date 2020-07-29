@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { format, formatRelative } from 'date-fns';
+import { format, formatRelative, addDays } from 'date-fns';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -210,7 +210,7 @@ export default function InfoWindow(props) {
                     )))}
                     {infoData.nextEvent.recurring_end && (infoData.nextEvent.recurring_end.toMillis() <= (new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) && // recurring end date is within next 7 days
                       <div>
-                        {'Through ' + format(infoData.nextEvent.recurring_end.toDate(), 'P')}
+                        {'Last day ' + format(addDays(infoData.nextEvent.recurring_end.toDate(), -1), 'P')}
                       </div>
                     }
                   </React.Fragment>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { areIntervalsOverlapping, isWithinInterval } from 'date-fns'
+import { areIntervalsOverlapping, isWithinInterval } from 'date-fns';
 
 import { styled } from '@material-ui/core/styles';
 

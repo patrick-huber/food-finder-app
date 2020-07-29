@@ -1,7 +1,8 @@
-import React from 'react';
-import { Route } from "react-router-dom";
-import * as ROUTES from '../../constants/routes';
+import React, { setState } from 'react';
 import { compose } from 'recompose';
+
+import { Route } from 'react-router-dom';
+import * as ROUTES from '../../constants/routes';
 
 import { withAuthorization, withEmailVerification } from '../Session';
 import { EventList } from '../Events';
@@ -30,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   buttonGroup: {
     marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
   },
   cardGrid: {
     paddingTop: theme.spacing(8),
@@ -42,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
   paperCallout: {
     marginTop: 30,
     marginBottom: 20,
+    padding: 20,
   }
 }));
 
@@ -56,20 +59,26 @@ const NewEventButton = () => (
 )
 
 
-function HomePage(props) {
+function EventsPage(props) {
   const classes = useStyles();
+
+  if(props.location.state) {
+    if(props.location.state.action && props.location.state.action) {
+      alert(props.location.state.action);
+      props.history.push({
+        state: { action: null }
+      });
+    }
+  }
 
   return (
     <React.Fragment>
       <CssBaseline />
       <div className={classes.appBarSpacer} />
       <main>
-        <Container className={classes.section} maxWidth="sm">
+        <Container className={classes.section} maxWidth="md">
           <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-            Vendor Portal
-          </Typography>
-          <Typography variant="h5" align="center" color="textSecondary" paragraph>
-            Manage your events on the Fair Food Finder
+            {props.authUser.vendor} Events
           </Typography>
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">
@@ -78,15 +87,7 @@ function HomePage(props) {
               </Grid>
             </Grid>
           </div>
-        </Container>
-        <Divider />
-        <Container className={classes.section} maxWidth="sm">
-          <Typography component="h2" variant="h4" align="center" color="textPrimary" gutterBottom>
-            Your Events
-          </Typography>
-          <Paper elevation={0} spacing={2} className={classes.paperCallout}>
-            <EventList />
-          </Paper>
+          <EventList authUser={props.authUser} {...props} />
         </Container>
       </main>
       <Footer />
@@ -97,6 +98,5 @@ function HomePage(props) {
 const condition = authUser => !!authUser;
 
 export default compose(
-  withEmailVerification,
   withAuthorization(condition),
-)(HomePage);
+)(EventsPage);

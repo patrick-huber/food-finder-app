@@ -11,3 +11,6 @@ export const ADMIN = '/admin';
 export const ADMIN_DETAILS = '/admin/:id';
 export const VENDOR = '/vendor';
 export const VENDOR_DETAILS = '/vendor/:id';
+export const EVENTS = '/events';
+export const EVENT_EDIT = '/events/edit/:id';
+export const EVENT_NEW = '/events/new';
