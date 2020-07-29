@@ -77,10 +77,10 @@ const styles = theme => ({
     marginTop: theme.spacing(3),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    margin: theme.spacing(1, 0),
   },
   submitWrapper: {
-    margin: theme.spacing(1),
+    margin: theme.spacing(2, 0, 0),
     position: 'relative',
   },
   buttonProgress: {
@@ -118,6 +118,10 @@ class EventEdit extends Component {
         days: [],
         notes: null,
         last_updated: today,
+      },
+      defaultValue: {
+        address: null,
+        location: null,
       }
     };
   }
@@ -135,12 +139,17 @@ class EventEdit extends Component {
           // Check for recurring event and format firestore dates
           const recurring = doc.data().recurring_start ? "yes" : "no";
           const daysSet = new Set(doc.data().days);
+          const location = {
+            lat: doc.data().location.latitude,
+            lng: doc.data().location.longitude,
+          }
           let formData = doc.data();
               formData.start_time = doc.data().start_time.toDate();
               formData.end_time = doc.data().end_time.toDate();
               formData.recurring_start = doc.data().recurring_start ? doc.data().recurring_start.toDate() : this.state.formData.recurring_start;
               formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : this.state.formData.recurring_end;
               formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : this.state.formData.last_updated;
+              formData.location = location;
 
           console.log("Document data:", doc.data());
 
@@ -148,6 +157,10 @@ class EventEdit extends Component {
             newEvent: false,
             event: doc.data(),
             formData: formData,
+            defaultValue: {
+              address: formData.address,
+              location: formData.location,
+            },
             loading: false,
             recurring: recurring,
             daysSet: daysSet,
@@ -167,8 +180,8 @@ class EventEdit extends Component {
 
   locationValueChange = (value, geo) => {
     let newFormData = this.state.formData;
-    newFormData['location'] = geo.geometry.location;
-    newFormData['address'] = value.description;
+    newFormData['location'] = geo;
+    newFormData['address'] = value.description ? value.description : value;
 
     this.setState({
       formData: newFormData,
@@ -252,8 +265,9 @@ class EventEdit extends Component {
   }
 
   submitForm = (e) => {
-    let data = this.state.formData;
+    let data = {...this.state.formData};
     e.preventDefault();
+
     this.setState({errorMissing: false});
 
     // Set update time
@@ -262,20 +276,23 @@ class EventEdit extends Component {
     // Validation
     for (const [key, value] of Object.entries(data)) {
       if(!value && key !== 'notes' && key !== 'days') {
-        console.log('missing field: '+ key)
+        console.log('missing field: '+ key);
         return this.setState({errorMissing: true});
       }
     }
 
-    // Update data for firestore
     // Add one day to last recurring day to account for final day
     data['recurring_end'] = addDays(data.recurring_end, 1);
-    
-    if(data.location.toJSON) {
-      // Convert location to GeoPoint object
-      const locationObj = data.location.toJSON();
-      data['location'] = new this.props.firebase.firestore.GeoPoint(locationObj.lat, locationObj.lng);
+
+    // recurring_end must be after start_date
+    if(this.state.recurring === "yes" && data.recurring_end < data.start_time) {
+        console.log('recurring_end before start_time');
+        alert('Last day must be later than First day');
+        return this.setState({errorMissing: true});
     }
+    
+    // Convert location to GeoPoint object
+    data['location'] = new this.props.firebase.firestore.GeoPoint(data.location.lat, data.location.lng);
 
     // remove recurring fields for one-time event
     if(this.state.recurring === "no") {
@@ -327,7 +344,7 @@ class EventEdit extends Component {
   }
 
   render() {
-    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet } = this.state;
+    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet, defaultValue } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 
@@ -356,7 +373,7 @@ class EventEdit extends Component {
                     <Fullscreen />
                   }
                   <LocalizationProvider dateAdapter={DateFnsUtils}>
-                    <form className={classes.form}>
+                    <form className={classes.form} action={null}>
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={12}>
                           <FormControl required fullWidth component="fieldset">
@@ -367,7 +384,7 @@ class EventEdit extends Component {
                           </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                          <LocationSearchInput defaultValue={formData.address} valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
+                          <LocationSearchInput defaultValue={defaultValue} valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
                         </Grid>
                         {recurring === "no" &&
                         <Grid item xs={12} sm={12}>
@@ -385,9 +402,8 @@ class EventEdit extends Component {
                         </Grid>
                         } {recurring === "yes" &&
                           <React.Fragment>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={6}>
                               <DatePicker
-                                disablePast
                                 id="recurring-start-date-picker"
                                 label="First Day"
                                 value={formData.start_time}
@@ -398,7 +414,7 @@ class EventEdit extends Component {
                                 renderInput={props => <TextField required fullWidth variant="outlined" {...props} helperText={null} />}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={6}>
                               <DatePicker
                                 disablePast
                                 id="recurring-end-date-picker"
@@ -414,7 +430,7 @@ class EventEdit extends Component {
                             </Grid>
                           </React.Fragment>
                         }
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={6}>
                           <TimePicker
                             id="start-time-picker"
                             label="Opening time"
@@ -426,7 +442,7 @@ class EventEdit extends Component {
                             renderInput={props => <TextField {...props} error={errorEndTime} helperText={null} required fullWidth variant="outlined" />}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={6}>
                           <TimePicker
                             id="end-time-picker"
                             label="Closing time"
@@ -480,6 +496,7 @@ class EventEdit extends Component {
                         </Grid>
                       </Grid>
                       <div className={classes.submitWrapper}>
+                        {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
                         <Button
                           type="submit"
                           disabled={errorEndTime || updatingFirestore}
@@ -493,7 +510,16 @@ class EventEdit extends Component {
                         </Button>
                         {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </div>
-                      {errorMissing && <FormHelperText error aria-label="missing required fields">Please fill out all required fields marked with an asterisk (*)</FormHelperText>}
+                      <Button
+                        disabled={updatingFirestore}
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        className={classes.submit}
+                        onClick={() => { this.props.history.goBack() }}
+                      >
+                        Cancel
+                      </Button>
                     </form>
                   </LocalizationProvider>
                 </div>
