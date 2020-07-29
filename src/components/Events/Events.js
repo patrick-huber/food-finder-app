@@ -15,10 +15,17 @@ import MUIDataTable from "mui-datatables";
 import { format } from 'date-fns';
 
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Typography from '@material-ui/core/Typography';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Button from '@material-ui/core/Button';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import Hidden from '@material-ui/core/Hidden';
 import Chip from '@material-ui/core/Chip';
 
 import Link from '@material-ui/core/Link';
@@ -65,24 +72,62 @@ class ActionsMenu extends Component {
     const { anchorEl, index } = this.state;
     return (
       <div>
-        <IconButton
-          aria-label="more"
-          aria-controls="long-menu"
-          aria-haspopup="true"
-          onClick={(event) => {this.handleClick(event)}}
-        >
-          <MoreVertIcon />
-        </IconButton>
-        <Menu
-          id={`"actions-${index}"`}
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClick={() => {this.handleClose()}}
-        >
-          <MenuItem onClick={() => {this.handleClose('Edit')}}>Edit</MenuItem>
-          <MenuItem onClick={() => {this.handleClose('Delete')}}>Delete</MenuItem>
-        </Menu>
+        <Hidden smDown>
+          <IconButton
+            aria-label="more"
+            aria-controls="long-menu"
+            aria-haspopup="true"
+            onClick={(event) => {this.handleClick(event)}}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id={`actions-${index}`}
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClick={() => {this.handleClose()}}
+          >
+            <MenuItem onClick={() => {this.handleClose('Edit')}}>
+              <ListItemIcon>
+                <EditIcon />
+              </ListItemIcon>
+              <Typography variant="inherit">Edit</Typography>
+            </MenuItem>
+            <MenuItem onClick={() => {this.handleClose('Delete')}}>
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <Typography variant="inherit">Delete</Typography>
+            </MenuItem>
+          </Menu>
+        </Hidden>
+        <Hidden mdUp>
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <Button
+                variant="outlined"
+                fullWidth
+                color="primary"
+                startIcon={<EditIcon />}
+                onClick={() => {this.handleClose('Edit')}}
+              >
+                Edit
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="outlined"
+                fullWidth
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={() => {this.handleClose('Delete')}}
+              >
+                Delete
+              </Button>
+            </Grid>
+          </Grid>
+        </Hidden>
       </div>
     )
   }
@@ -159,10 +204,9 @@ class EventsList extends Component {
             tableData.push({
               address: doc.data().address,
               date: format(doc.data().start_time.toDate(), 'P'),
-              open: format(doc.data().start_time.toDate(), 'p'),
-              close: format(doc.data().end_time.toDate(), 'p'),
-              recurring_end: recurring_end,
+              hours: (format(doc.data().start_time.toDate(), 'p') + ' - ' + format(doc.data().end_time.toDate(), 'p')),
               days: days,
+              recurring_end: recurring_end,
               uid: doc.id,
             });
           }, err => {
@@ -223,18 +267,10 @@ class EventsList extends Component {
       }
      },
      {
-      name: "open",
-      label: "Opening Time",
+      name: "hours",
+      label: "Hours",
       options: {
-        filter: true,
-        sort: true,
-      }
-     },
-     {
-      name: "close",
-      label: "Closing Time",
-      options: {
-        filter: true,
+        filter: false,
         sort: true,
       }
      },
