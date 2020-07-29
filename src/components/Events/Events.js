@@ -217,6 +217,9 @@ class EventsList extends Component {
             });
           });
 
+          // Sort by date - newest first
+          tableData.sort((a, b) => (a.date < b.date) ? 1 : -1);
+
           this.setState({
             events: events,
             tableData: tableData,
