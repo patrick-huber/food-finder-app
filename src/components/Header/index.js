@@ -54,13 +54,13 @@ const useStyles = makeStyles((theme) => ({
     '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
     filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
-  hide: {
-    display: 'none',
-  },
   drawer: {
     '& .MuiDrawer-paper': {
       backgroundColor: 'rgba(235, 245, 254, 0.95)',  
     }
+  },
+  setVendor: {
+    paddingBottom: 20,
   },
   list: {
     width: '100vw',
@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
   mapIcon: {
     color: theme.palette.secondary.main,
-  }
+  },
 }));
 
 export default function Header() {
@@ -98,14 +98,18 @@ export default function Header() {
 
   const NavigationAuth = ({ authUser }) => ( 
     <div>
-      <Container maxWidth="sm">
+      {!!authUser.roles[ROLES.ADMIN] && (
+        <Container maxWidth="sm" className={clsx(classes.setVendor)}>
+          <SetVendor/>
+        </Container>
+      )}
+      <Container>
         <Typography gutterBottom component="div" variant="h5">
           {authUser.username}
           <Typography component="span" variant="subtitle1">
             &nbsp;({authUser.email} )
           </Typography>
         </Typography>
-        <SetVendor />
       </Container>
       <div
         className={clsx(classes.list)}
