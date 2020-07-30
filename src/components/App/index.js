@@ -99,12 +99,29 @@ function App (props) {
             </Page>
           )}
         />
-        
-        <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-        <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+        <Route
+          path={ROUTES.SIGN_UP}
+          render={() => (
+            <Page title={ROUTE_TITLES.SIGN_UP} firebase={props.firebase} >
+              <SignUpPage />
+            </Page>
+          )}
+        />
+        <Route
+          path={ROUTES.SIGN_IN}
+          render={() => (
+            <Page title={ROUTE_TITLES.SIGN_IN} firebase={props.firebase} >
+              <SignInPage />
+            </Page>
+          )}
+        />
         <Route
           path={ROUTES.PASSWORD_FORGET}
-          component={PasswordForgetPage}
+          render={() => (
+            <Page title={ROUTE_TITLES.PASSWORD_FORGET} firebase={props.firebase} >
+              <PasswordForgetPage />
+            </Page>
+          )}
         />
         <Route path={ROUTES.HOME} component={HomePage} />
         <Route path={ROUTES.ACCOUNT} component={AccountPage} />
