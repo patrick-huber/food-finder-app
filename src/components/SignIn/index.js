@@ -15,6 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
@@ -58,6 +59,7 @@ const INITIAL_STATE = {
   email: '',
   password: '',
   error: null,
+  loading: false,
 };
 
 const ERROR_CODE_ACCOUNT_EXISTS =
@@ -80,6 +82,8 @@ class SignInFormBase extends Component {
   onSubmit = event => {
     const { email, password } = this.state;
 
+    this.setState({loading: true});
+
     this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then(() => {
@@ -87,7 +91,7 @@ class SignInFormBase extends Component {
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch(error => {
-        this.setState({ error });
+        this.setState({ loading: false, error });
       });
 
     event.preventDefault();
@@ -98,7 +102,7 @@ class SignInFormBase extends Component {
   };
 
   render() {
-    const { email, password, error } = this.state;
+    const { email, password, error, loading } = this.state;
 
     const isInvalid = password === '' || email === '';
 
@@ -131,13 +135,16 @@ class SignInFormBase extends Component {
           onChange={this.onChange}
         />
         <Button
-          disabled={isInvalid}
+          disabled={isInvalid || loading}
           type="submit"
           fullWidth
           variant="contained"
           color="primary"
         >
           Sign In
+          {loading &&
+            <CircularProgress size={20} />
+          }
         </Button>
         {error && <FormHelperText error aria-label="missing required fields">{error.message}</FormHelperText>}
       </form>

@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
@@ -54,6 +55,7 @@ function PasswordForgetPage(props) {
 const INITIAL_STATE = {
   email: '',
   error: null,
+  loading: false,
 };
 
 class PasswordForgetFormBase extends Component {
@@ -66,6 +68,8 @@ class PasswordForgetFormBase extends Component {
   onSubmit = event => {
     const { email } = this.state;
 
+    this.setState({loading: true});
+
     this.props.firebase
       .doPasswordReset(email)
       .then(() => {
@@ -73,7 +77,7 @@ class PasswordForgetFormBase extends Component {
         this.props.history.goBack();
       })
       .catch(error => {
-        this.setState({ error });
+        this.setState({ loading: false, error });
       });
 
     event.preventDefault();
@@ -84,7 +88,7 @@ class PasswordForgetFormBase extends Component {
   };
 
   render() {
-    const { email, error } = this.state;
+    const { email, error, loading } = this.state;
 
     const isInvalid = email === '';
 
@@ -106,13 +110,16 @@ class PasswordForgetFormBase extends Component {
         />
 
         <Button
-          disabled={isInvalid}
+          disabled={isInvalid || loading}
           type="submit"
           fullWidth
           variant="contained"
           color="primary"
         >
           Reset My Password
+          {loading &&
+            <CircularProgress size={20} />
+          }
         </Button>
 
         {error && <FormHelperText error aria-label="missing required fields">{error.message}</FormHelperText>}
