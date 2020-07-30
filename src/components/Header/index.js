@@ -20,6 +20,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import CloseIcon from '@material-ui/icons/Close';
+import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -53,13 +54,13 @@ const useStyles = makeStyles((theme) => ({
     '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
     filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
-  hide: {
-    display: 'none',
-  },
   drawer: {
     '& .MuiDrawer-paper': {
       backgroundColor: 'rgba(235, 245, 254, 0.95)',  
     }
+  },
+  setVendor: {
+    paddingBottom: 20,
   },
   list: {
     width: '100vw',
@@ -70,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
   mapIcon: {
     color: theme.palette.secondary.main,
-  }
+  },
 }));
 
 export default function Header() {
@@ -97,8 +98,18 @@ export default function Header() {
 
   const NavigationAuth = ({ authUser }) => ( 
     <div>
-      <Container maxWidth="sm">
-        <SetVendor />
+      {!!authUser.roles[ROLES.ADMIN] && (
+        <Container maxWidth="sm" className={clsx(classes.setVendor)}>
+          <SetVendor/>
+        </Container>
+      )}
+      <Container>
+        <Typography gutterBottom component="div" variant="h5">
+          {authUser.username}
+          <Typography component="span" variant="subtitle1">
+            &nbsp;({authUser.email} )
+          </Typography>
+        </Typography>
       </Container>
       <div
         className={clsx(classes.list)}
@@ -107,33 +118,15 @@ export default function Header() {
         onKeyDown={handleDrawerClose}
       >
         <List className={clsx(classes.menuList)} component="nav" aria-label="Primary nav">
-          <Link to={ROUTES.EVENTS}>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.EVENTS}>
             <ListItem
               button
             >
               <ListItemIcon></ListItemIcon>
-              <ListItemText primary="Events" />
+              <ListItemText primary="Manage Events" />
             </ListItem>
           </Link>
-          <Link to={ROUTES.ACCOUNT}>
-            <ListItem
-              button
-            >
-              <ListItemIcon></ListItemIcon>
-              <ListItemText primary="Profile" />
-            </ListItem>
-          </Link>
-          {!!authUser.roles[ROLES.ADMIN] && (
-          <Link to={ROUTES.ADMIN}>
-            <ListItem
-              button
-            >
-              <ListItemIcon></ListItemIcon>
-              <ListItemText primary="Admin" />
-            </ListItem>
-          </Link>
-          )}
-          <Link to={ROUTES.ACCOUNT}>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.ACCOUNT}>
             <ListItem
               button
             >
@@ -141,16 +134,22 @@ export default function Header() {
               <SignOutButton />
             </ListItem>
           </Link>
-
           <Divider />
-          <Link to={ROUTES.LANDING}>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.LANDING}>
             <ListItem
               button
             >
               <ListItemIcon>
-                <RoomIcon />
+                <RoomIcon className={clsx(classes.mapIcon)} />
               </ListItemIcon>
               <ListItemText primary="Food Finder Map" />
+            </ListItem>
+          </Link>
+          <Link className={clsx(classes.menuLink)} to={ROUTES.SUPPORT}>
+            <ListItem
+              button
+            >
+              <ListItemText inset primary="Support & Contact" />
             </ListItem>
           </Link>
         </List>
@@ -170,7 +169,6 @@ export default function Header() {
           <Link className={clsx(classes.menuLink)} to={ROUTES.LANDING}>
             <ListItem
               button
-              selected
             >
               <ListItemIcon>
                 <RoomIcon className={clsx(classes.mapIcon)} />
