@@ -26,6 +26,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import RoomIcon from '@material-ui/icons/Room';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import ReportProblemIcon from '@material-ui/icons/ReportProblem';
 
 import { SetVendor } from '../Vendors';
@@ -188,6 +189,17 @@ export default function Header() {
               button
             >
               <ListItemText inset primary="Support & Contact" />
+            </ListItem>
+          </Link>
+          <Divider />
+          <Link className={clsx(classes.menuLink)} to={ROUTES.SIGN_IN}>
+            <ListItem
+              button
+            >
+              <ListItemIcon>
+                <LockOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Vendor Login" />
             </ListItem>
           </Link>
           <Divider />

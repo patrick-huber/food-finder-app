@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+
+import * as ROUTES from '../../constants/routes';
 
 import Footer from '../Footer';
 
@@ -27,6 +30,10 @@ const useStyles = makeStyles((theme) => ({
   },
   heroButtons: {
     marginTop: theme.spacing(4),
+  },
+  buttonLink: {
+    textDecoration: 'none !important',
+    color: 'inherit',
   },
   cardGrid: {
     paddingTop: theme.spacing(8),
@@ -65,9 +72,16 @@ export default function VendorPage() {
             <div className={classes.heroButtons}>
               <Grid container spacing={2} justify="center">
                 <Grid item>
-                  <Button variant="contained" color="primary" onClick={() => window.open('https://forms.gle/kztvUZ3t7DYDaJZq5')}>
+                  <Button variant="contained" color="primary" onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSciifqS0CrTt5diM0WFnM1bSVFTUy1342pxWKmE07YfdS_sBQ/viewform?usp=sf_link')}>
                     Get Listed
                   </Button>
+                </Grid>
+                <Grid item>
+                  <RouterLink className={classes.buttonLink} to={ROUTES.SIGN_IN}>
+                    <Button variant="outlined" color="secondary">
+                      Vendor Login
+                    </Button>
+                  </RouterLink>
                 </Grid>
               </Grid>
             </div>
@@ -81,45 +95,47 @@ export default function VendorPage() {
                 Thousands of hungry people are searching
               </Typography>
               <Typography component="p" align="center" paragraph>
-                People from all across the metro area are actively searching for YOUR food stand!
+                People from all across Minnesota are actively searching for YOUR food stand!
               </Typography>
-              <Paper elevation={0} spacing={2} className={classes.paperCallout}>
-                <List
-                  subheader={
-                    <ListSubheader component="div" color="primary">
-                      By the numbers
-                    </ListSubheader>
-                  }>
-                  <ListItem>
-                    <ListItemIcon>
-                      <RoomIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="1.2 Million views of the Food Finder map" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={() => window.open('https://www.facebook.com/groups/245420266734458')}
-                  >
-                    <ListItemIcon>
-                      <FacebookIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="166K Members in Fair Food Finder Facebook group" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={() => window.open('https://forms.gle/QddFymSXK9akxd7K6')}
-                  >
-                    <ListItemIcon>
-                      <FormatListNumberedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="780 Survey responses" secondary="92% plan to visit a food vendor in next 30 days" />
-                  </ListItem>
-                </List>
-              </Paper>
+              <Container maxWidth="sm">
+                <Paper elevation={0} spacing={2} className={classes.paperCallout}>
+                  <List
+                    subheader={
+                      <ListSubheader component="div" color="primary">
+                        By the numbers
+                      </ListSubheader>
+                    }>
+                    <ListItem>
+                      <ListItemIcon>
+                        <RoomIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="1.3 Million views of the Food Finder map" />
+                    </ListItem>
+                    <ListItem
+                      button
+                      onClick={() => window.open('https://www.facebook.com/groups/245420266734458')}
+                    >
+                      <ListItemIcon>
+                        <FacebookIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="169K Members in Fair Food Finder Facebook group" />
+                    </ListItem>
+                    <ListItem
+                      button
+                      onClick={() => window.open('https://forms.gle/QddFymSXK9akxd7K6')}
+                    >
+                      <ListItemIcon>
+                        <FormatListNumberedIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="92% of users plan to visit a food vendor in next 30 days" secondary="of 780 responses to our survey" />
+                    </ListItem>
+                  </List>
+                </Paper>
+              </Container>
               <div className={classes.heroButtons}>
                 <Grid container spacing={2} justify="center">
                   <Grid item>
-                    <Button variant="contained" color="primary" onClick={() => window.open('https://forms.gle/kztvUZ3t7DYDaJZq5')}>
+                    <Button variant="contained" color="primary" onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSciifqS0CrTt5diM0WFnM1bSVFTUy1342pxWKmE07YfdS_sBQ/viewform?usp=sf_link')}>
                       Add Your Stand
                     </Button>
                   </Grid>
@@ -128,31 +144,39 @@ export default function VendorPage() {
             </Container>
           </Grid>
         </Container>
-        <Container className={classes.section} maxWidth="md">
-          {/* End hero unit */}
-          <Grid container spacing={4}>
-            <Container>
-              <Typography component="h2" variant="h3" align="center" gutterBottom>
-                Future Vendor Dashboard
-              </Typography>
-              <Typography component="p" align="center" paragraph>
-                We're working on a new vendor dashboard which will allow you to update your hours and add new events to the Fair Food Finder app. You'll also be able to see how many people see your events, get directions to your location, view your website or menu, and visit your social media pages.
-              </Typography>
-              <Typography component="p" align="center" paragraph>
-                Vendors signed up will get first access to the dashboard once it's available. Fill our the <Link href="https://forms.gle/kztvUZ3t7DYDaJZq5" color="inherit">Vendor Signup form</Link> to get added to the list.
-              </Typography>
-              <div className={classes.heroButtons}>
-                <Grid container spacing={2} justify="center">
-                  <Grid item>
-                    <Button variant="contained" color="default" onClick={() => window.open('https://forms.gle/kztvUZ3t7DYDaJZq5')}>
-                      Vendor Signup Form
-                    </Button>
+        <div className={classes.section}>
+          <Container maxWidth="md">
+            {/* End hero unit */}
+            <Grid container spacing={4}>
+              <Container>
+                <Typography component="h2" variant="h3" align="center" gutterBottom>
+                  Vendor Dashboard
+                </Typography>
+                <Typography component="p" align="center" paragraph>
+                  The new Vendor Dashboard is live! It allows you to update your events and add new events to the Fair Food Finder app.
+                </Typography>
+                <Typography component="p" align="center" paragraph>
+                  We're building out new features, including event insights and metrics. You'll be able to see things like: how many people see your events, get directions to a location, view your website or menu, and visit your social media pages.
+                </Typography>
+                <Typography component="h2" variant="h4" align="center" gutterBottom>
+                  Get Signed Up
+                </Typography>
+                <Typography component="p" align="center" paragraph>
+                  Fill out the <Link href="https://docs.google.com/forms/d/e/1FAIpQLSciifqS0CrTt5diM0WFnM1bSVFTUy1342pxWKmE07YfdS_sBQ/viewform?usp=sf_link" color="inherit">Vendor Signup form</Link> to get access to the Vendor Dashboard.
+                </Typography>
+                <div className={classes.heroButtons}>
+                  <Grid container spacing={2} justify="center">
+                    <Grid item>
+                      <Button variant="contained" color="default" onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSciifqS0CrTt5diM0WFnM1bSVFTUy1342pxWKmE07YfdS_sBQ/viewform?usp=sf_link')}>
+                        Vendor Signup Form
+                      </Button>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </div>
-            </Container>
-          </Grid>
-        </Container>
+                </div>
+              </Container>
+            </Grid>
+          </Container>
+        </div>
       </main>
       <Footer />
     </React.Fragment>
