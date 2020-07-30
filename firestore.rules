@@ -12,29 +12,16 @@ service cloud.firestore {
       'ADMIN'in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.values();
     }
 
-    function isCalendarOwner() {
-      return signedIn() && request.auth.vendor == resource.data.vendor;
-    }
-
-    function isVendorOwner() {
-      return signedIn() && request.auth.vendor == resource.id;
-    }
-
-    function isSelf() {
-      return signedIn() && request.auth.uid == resource.id;
-    }
-
     // Rules
     match /users/{userId} {
-      allow list: if isAdmin();
-      allow get, update, delete: if isSelf() || isAdmin();
-      allow create: if signedIn();
+      allow list, delete: if isAdmin();
+      allow create, get, update: if signedIn() && request.auth.uid == userId;
     }
 
     match /vendors/{vendorId} {
       allow get, list;
       allow create, delete: if isAdmin();
-      allow update: if isVendorOwner();
+      allow update: if signedIn() && request.auth.vendor == vendorId;
     }
 
     match /calendar/{eventId} {

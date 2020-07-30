@@ -18,8 +18,6 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
-import Footer from '../Footer';
-
 const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   paper: {
@@ -45,7 +43,7 @@ function SignInPage() {
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">
+        <Typography gutterBottom component="h1" variant="h5">
           Vendor Sign in
         </Typography>
         <SignInForm />
@@ -112,7 +110,7 @@ class SignInFormBase extends Component {
           required
           fullWidth
           id="email"
-          label="Email Address"
+          label="Email address"
           name="email"
           autoComplete="email"
           autoFocus
