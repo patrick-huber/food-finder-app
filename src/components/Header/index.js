@@ -20,6 +20,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import CloseIcon from '@material-ui/icons/Close';
+import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -98,6 +99,12 @@ export default function Header() {
   const NavigationAuth = ({ authUser }) => ( 
     <div>
       <Container maxWidth="sm">
+        <Typography gutterBottom component="div" variant="h5">
+          {authUser.username}
+          <Typography component="span" variant="subtitle1">
+            &nbsp;({authUser.email} )
+          </Typography>
+        </Typography>
         <SetVendor />
       </Container>
       <div
