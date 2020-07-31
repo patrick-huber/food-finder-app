@@ -12,7 +12,7 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
 import EventIcon from '@material-ui/icons/Event';
 
-import { InfoWindow as InfoWindowVendor } from '../Map';
+import { InfoWindowList, InfoWindow as InfoWindowVendor } from '../Map';
 
 import Typography from '@material-ui/core/Typography';
 
@@ -501,51 +501,121 @@ class GMap extends Component {
 
   setSelected = (marker) => {
     if(marker) {
+      let markerData = {};
+
       this.setState({
         infoLoading: true,
       });
 
-      // Load vendor details into infoWindow
-      const vendor = this.props.firebase
-        .vendor(marker.vendor)
-        .onSnapshot(vendor => {
-          let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
+      // Check for multiple vendors at this location
+      if(marker.place_id) {
+        const location = this.props.firebase
+          .calendar()
+          .where('place_id', '==', marker.place_id)
+          .onSnapshot(events => {
+            if(events.size) {
+              let vendorsArray = [];
 
-          if(vendorEvents[0].recurring_start) {
-            // If next event is recurring then we need to calculate updated start_time for all recurring events to display correct order by date
-            for (var i = vendorEvents.length - 1; i >= 0; i--) {
-              if(vendorEvents[i].recurring_start) vendorEvents[i] = getNextDate(vendorEvents[i], this.props.firebase);
+              // Group events by vendor and add to vendor set
+              events.forEach(event => {
+                const eventData = event.data();
+                let updatedEvent = eventData;
+                markerData[eventData.vendor] = markerData[eventData.vendor] || { info: null, events: [] };
+
+                // If eventData is recurring, need to calculate updated start_time to display correct order by date
+                if(eventData.recurring_start) {
+                  updatedEvent = getNextDate(eventData, this.props.firebase);
+                }
+
+                markerData[eventData.vendor].events.push(updatedEvent);
+              });
+
+              const vendorsLength = Object.keys(markerData).length;
+              const promise = (new Promise(() => {
+                Object.keys(markerData).forEach((vendor, index) => {
+                  // sort each vendor's events by start_time
+                  markerData[vendor].events.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
+
+                  // Set isOpen property for next event
+                  markerData[vendor].events[0]['isOpen'] = this.isOpen(markerData[vendor].events[0]);
+
+                  // Get vendor details
+                  this.props.firebase
+                    .vendor(vendor)
+                    .get()
+                    .then(vendorDoc => {
+                      markerData[vendor].info = {
+                        title: vendorDoc.data().name,
+                        phone: formatPhoneNumber(vendorDoc.data().phone),
+                        website: vendorDoc.data().website,
+                        menu: vendorDoc.data().menu,
+                        photo: vendorDoc.data().photo,
+                        facebook: vendorDoc.data().facebook,
+                        instagram: vendorDoc.data().instagram,
+                      }
+                      vendorsArray.push(markerData[vendor]);
+                      if(vendorsLength-1 === index) {
+                        return this.setState({
+                          selected: marker,
+                          infoLoading: false,
+                          infoData: vendorsArray,
+                        });
+                      }
+                    });
+                });
+              }))
+
+            } else {
+              console.error('Unable to load details for place_id: ' + marker.place_id);
             }
-            vendorEvents.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
-          }
-
-          this.setState({
-            selected: marker,
-            infoLoading: false,
-            infoData: {
-              title: vendor.data().name,
-              address: vendorEvents[0].address,
-              phone: formatPhoneNumber(vendor.data().phone),
-              website: vendor.data().website,
-              menu: vendor.data().menu,
-              isOpen: this.isOpen(vendorEvents[0]),
-              nextEvent: vendorEvents[0],
-              events: vendorEvents,
-              photo: vendor.data().photo,
-              facebook: vendor.data().facebook,
-              instagram: vendor.data().instagram,
+          }, err => {
+            console.error('No events at this place_id!');
+          });
+      } else {
+        // Fallback to lookup all events using getCalendarEventsAtLocation
+        const vendor = this.props.firebase
+          .vendor(marker.vendor)
+          .get()
+          .then(vendorDoc => {
+            const vendor = vendorDoc.data();
+            markerData[vendorDoc.id] = {};
+            markerData[vendorDoc.id].info = {
+              title: vendor.name,
+              phone: formatPhoneNumber(vendor.phone),
+              website: vendor.website,
+              menu: vendor.menu,
+              photo: vendor.photo,
+              facebook: vendor.facebook,
+              instagram: vendor.instagram,
             }
-          });
+            markerData[vendorDoc.id].events = this.getCalendarEventsAtLocation(marker.location);
 
-          this.props.firebase.analytics.logEvent('marker_selected', {
-            location_id: marker.uid,
-            location_address: vendorEvents[0].address,
-            vendor_id: marker.vendor,
-            vendor: vendor.data().name,
+            if(markerData[vendorDoc.id].events[0].recurring_start) {
+              // If next event is recurring then we need to calculate updated start_time for all recurring events to display correct order by date
+              for (var i = markerData[vendorDoc.id].events.length - 1; i >= 0; i--) {
+                if(markerData[vendorDoc.id].events[i].recurring_start) markerData[vendorDoc.id].events[i] = getNextDate(markerData[vendorDoc.id].events[i], this.props.firebase);
+              }
+              // sort each vendor's events by start_time
+              markerData[vendorDoc.id].events.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
+              // Set isOpen property for next event
+              markerData[vendorDoc.id].events[0].isOpen = this.isOpen(markerData[vendorDoc.id].events[0]);
+            }
+
+            this.props.firebase.analytics.logEvent('marker_selected', {
+              location_id: marker.uid,
+              location_address: markerData[vendorDoc.id].events[0].address,
+              vendor_id: marker.vendor,
+              vendor: vendor.name,
+            });
+            this.setState({
+              selected: marker,
+              infoLoading: false,
+              infoData: markerData,
+            });
+          }, err => {
+            console.log('No such vendor!');
           });
-        }, err => {
-          console.log('No such vendor!');
-        });
+      }
     } else {
       this.setState({
         selected: null,
@@ -725,11 +795,19 @@ class GMap extends Component {
               >
                 {infoLoading
                   ? <Spinner />
-                  : <InfoWindowVendor
-                      infoData={infoData}
-                      firebase={this.props.firebase}
-                      onRender={(height) => { this.setPan(height) }}
-                    />
+                    : (infoData.length > 1)
+                      ?
+                        <InfoWindowList
+                          infoData={infoData}
+                          firebase={this.props.firebase}
+                          onRender={(height) => { this.setPan(height) }}
+                        />
+                      :
+                        <InfoWindowVendor
+                          infoData={infoData[selected.vendor]}
+                          firebase={this.props.firebase}
+                          onRender={(height) => { this.setPan(height) }}
+                        />
                 }
               </InfoWindow>
             ) : null}

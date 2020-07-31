@@ -75,21 +75,24 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function InfoWindow(props) {
   const observed = useRef(null);
-  const infoData = props.infoData;
+  const vendorData = props.infoData;
+  console.log(vendorData);
   const [modalOpen, setModalOpen] = useState(false);
   const firebase = props.firebase;
-  const websiteString = infoData.website ? infoData.website.slice(infoData.website.search('//') + 2) : null;
+  const websiteString = vendorData.info.website ? vendorData.info.website.slice(vendorData.info.website.search('//') + 2) : null;
 
   useEffect(() => {
-    props.onRender((observed.current.clientHeight === 0) ? 300 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
+    if(props.onRender) {
+      props.onRender((observed.current.clientHeight === 0) ? 300 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
+    }    
   }, [observed]);
 
   function openDirections(location) {
     firebase.analytics.logEvent('get_directions', {
-      location_id: infoData.nextEvent.uid,
-      location_address: infoData.nextEvent.address,
-      vendor_id: infoData.nextEvent.vendor,
-      vendor: infoData.title,
+      location_id: vendorData.events[0].uid,
+      location_address: vendorData.events[0].address,
+      vendor_id: vendorData.events[0].vendor,
+      vendor: vendorData.info.title,
     });
 
     // Opens google maps directions in new window with specified location as the endpoint
@@ -98,10 +101,10 @@ export default function InfoWindow(props) {
 
   function callPhone(number) {
     firebase.analytics.logEvent('call_number', {
-      location_id: infoData.nextEvent.uid,
-      location_address: infoData.nextEvent.address,
-      vendor_id: infoData.nextEvent.vendor,
-      vendor: infoData.title,
+      location_id: vendorData.events[0].uid,
+      location_address: vendorData.events[0].address,
+      vendor_id: vendorData.events[0].vendor,
+      vendor: vendorData.info.title,
       phone: number,
     });
 
@@ -110,10 +113,10 @@ export default function InfoWindow(props) {
 
   function openWebsite(link) {
     firebase.analytics.logEvent('view_website', {
-      location_id: infoData.nextEvent.uid,
-      location_address: infoData.nextEvent.address,
-      vendor_id: infoData.nextEvent.vendor,
-      vendor: infoData.title,
+      location_id: vendorData.events[0].uid,
+      location_address: vendorData.events[0].address,
+      vendor_id: vendorData.events[0].vendor,
+      vendor: vendorData.info.title,
       website: link,
     });
 
@@ -122,10 +125,10 @@ export default function InfoWindow(props) {
 
   function openMenu(link) {
     firebase.analytics.logEvent('view_menu', {
-      location_id: infoData.nextEvent.uid,
-      location_address: infoData.nextEvent.address,
-      vendor_id: infoData.nextEvent.vendor,
-      vendor: infoData.title,
+      location_id: vendorData.events[0].uid,
+      location_address: vendorData.events[0].address,
+      vendor_id: vendorData.events[0].vendor,
+      vendor: vendorData.info.title,
       menu: link,
     });
 
@@ -134,10 +137,10 @@ export default function InfoWindow(props) {
 
   function openSocial(platform, url) {
     firebase.analytics.logEvent(('visit_'+platform), {
-      location_id: infoData.nextEvent.uid,
-      location_address: infoData.nextEvent.address,
-      vendor_id: infoData.nextEvent.vendor,
-      vendor: infoData.title,
+      location_id: vendorData.events[0].uid,
+      location_address: vendorData.events[0].address,
+      vendor_id: vendorData.events[0].vendor,
+      vendor: vendorData.info.title,
       url: url,
     });
 
@@ -147,34 +150,34 @@ export default function InfoWindow(props) {
   return (
     <Container disableGutters ref={observed}>
       <Title variant="h5" component="h2">
-        {infoData.title}
+        {vendorData.info.title}
       </Title>
       <Grid container>
         <Grid item xs>
           <List>
-            <CompactListItem alignItems={'flex-start'} key="address" button onClick={() => openDirections(infoData.events[0].location)}>
+            <CompactListItem alignItems={'flex-start'} key="address" button onClick={() => openDirections(vendorData.events[0].location)}>
               <CompactListItemIcon>
                 <DirectionsIcon />
               </CompactListItemIcon>
-              <ListItemText primary={infoData.address} />
+              <ListItemText primary={vendorData.events[0].address} />
             </CompactListItem>
-            {infoData.phone &&
-              <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => callPhone(infoData.phone)}>
+            {vendorData.info.phone &&
+              <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => callPhone(vendorData.info.phone)}>
                 <CompactListItemIcon>
                   <PhoneIcon />
                 </CompactListItemIcon>
-                <ListItemText primary={infoData.phone} />
+                <ListItemText primary={vendorData.info.phone} />
               </CompactListItem>
             }
-            {infoData.website &&
-              <CompactListItem alignItems={'flex-start'} key="website" button onClick={() => openWebsite(infoData.website)}>
+            {vendorData.info.website &&
+              <CompactListItem alignItems={'flex-start'} key="website" button onClick={() => openWebsite(vendorData.info.website)}>
                 <CompactListItemIcon>
                   <LanguageIcon />
                 </CompactListItemIcon>
                 <ListItemText primary={websiteString} />
               </CompactListItem>
-            }{infoData.menu &&
-              <CompactListItem alignItems={'flex-start'} key="menu" button onClick={() => openMenu(infoData.menu)}>
+            }{vendorData.info.menu &&
+              <CompactListItem alignItems={'flex-start'} key="menu" button onClick={() => openMenu(vendorData.info.menu)}>
                 <CompactListItemIcon>
                   <RestaurantMenuIcon />
                 </CompactListItemIcon>
@@ -186,9 +189,9 @@ export default function InfoWindow(props) {
                 <ScheduleIcon />
               </CompactListItemIcon>
               <ListItemText
-                primary={infoData.isOpen ? 'Open now' : 'Closed'}
-                secondary={(infoData.isOpen ? (format(infoData.nextEvent.start_time.toDate(), 'p') + format(infoData.nextEvent.end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(infoData.nextEvent.start_time.toDate(), new Date()))) }
-                className={infoData.isOpen ? 'text-open' : 'text-closed'}
+                primary={vendorData.events[0].isOpen ? 'Open now' : 'Closed'}
+                secondary={(vendorData.events[0].isOpen ? (format(vendorData.events[0].start_time.toDate(), 'p') + format(vendorData.events[0].end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(vendorData.events[0].start_time.toDate(), new Date()))) }
+                className={vendorData.events[0].isOpen ? 'text-open' : 'text-closed'}
               />
             </CompactListItem>
             <CompactListItem alignItems={'flex-start'} key="hours">
@@ -196,21 +199,21 @@ export default function InfoWindow(props) {
                 <EventIcon />
               </CompactListItemIcon>
               <ListItemText
-                primary={infoData.nextEvent.recurring_start ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
+                primary={vendorData.events[0].recurring_start ? vendorData.events[0].daysString : format(vendorData.events[0].start_time.toDate(), 'EEEE, MMMM do')}
                 secondaryTypographyProps={{component:'div'}}
                 secondary={
                   <React.Fragment>
                     <div>
                     {
-                      format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p')
+                      format(vendorData.events[0].start_time.toDate(), 'p')+ format(vendorData.events[0].end_time.toDate(), ' - p')
                     }
                     </div>
-                    {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour, index) => (
+                    {vendorData.events[0].additionalHours && (vendorData.events[0].additionalHours.map((hour, index) => (
                       <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
                     )))}
-                    {infoData.nextEvent.recurring_end && (infoData.nextEvent.recurring_end.toMillis() <= (new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) && // recurring end date is within next 7 days
+                    {vendorData.events[0].recurring_end && (vendorData.events[0].recurring_end.toMillis() <= (new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) && // recurring end date is within next 7 days
                       <div>
-                        {'Last day ' + format(addDays(infoData.nextEvent.recurring_end.toDate(), -1), 'P')}
+                        {'Last day ' + format(addDays(vendorData.events[0].recurring_end.toDate(), -1), 'P')}
                       </div>
                     }
                   </React.Fragment>
@@ -219,22 +222,22 @@ export default function InfoWindow(props) {
             </CompactListItem>
           </List>
         </Grid>
-        {(infoData.photo || infoData.instagram || infoData.facebook) &&
+        {(vendorData.info.photo || vendorData.info.instagram || vendorData.info.facebook) &&
           <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
-            {infoData.photo &&
-              <img src={infoData.photo} alt="Vendor" style={{width:'100%'}} />
+            {vendorData.info.photo &&
+              <img src={vendorData.info.photo} alt="Vendor" style={{width:'100%'}} />
             }
             <Grid container justify="space-evenly" spacing={1}>
-              {infoData.instagram &&
+              {vendorData.info.instagram &&
                 <Grid item xs>
-                  <SocialIconButton size="small" onClick={() => openSocial('instagram', 'https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
+                  <SocialIconButton size="small" onClick={() => openSocial('instagram', 'https://www.instagram.com/'+vendorData.info.instagram)} aria-label="Instagram">
                     <InstagramIcon />
                   </SocialIconButton>
                 </Grid>
               }
-              {infoData.facebook &&
+              {vendorData.info.facebook &&
                 <Grid item xs>
-                  <SocialIconButton size="small" onClick={() => openSocial('facebook', 'https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
+                  <SocialIconButton size="small" onClick={() => openSocial('facebook', 'https://www.facebook.com/'+vendorData.info.facebook)} aria-label="Facebook">
                     <FacebookIcon />
                   </SocialIconButton>
                 </Grid>
@@ -243,14 +246,14 @@ export default function InfoWindow(props) {
           </Grid>
         }
       </Grid>
-      {infoData.events.length > 1 &&
+      {vendorData.events.length > 1 &&
         <List>
           <CompactListItem
             key="calendar"
             button
             onClick={() => setModalOpen(true)}>
               <ListItemTextCenter
-                primary={(infoData.events.length-1) + ' other time' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
+                primary={(vendorData.events.length-1) + ' other time' + ((vendorData.events.length-1 === 1) ? '' : 's') + ' at this location'}
                 secondary='View all dates and times'
               />
             </CompactListItem>
@@ -269,7 +272,7 @@ export default function InfoWindow(props) {
                     All dates and times at this location
                   </Typography>
                 </Toolbar>
-                <CalendarList calendar={infoData.events} />
+                <CalendarList calendar={vendorData.events} />
                 <Button
                   onClick={() => setModalOpen(false)}
                   fullWidth>
