@@ -111,6 +111,7 @@ class EventEdit extends Component {
         vendor: this.props.authUser.vendor,
         location: null,
         address: null,
+        place_id: null,
         start_time: set(today, { hours: 11, minutes: 0 }),
         end_time: set(today, { hours: 19, minutes: 0 }),
         recurring_start: today,
@@ -178,10 +179,11 @@ class EventEdit extends Component {
     this.unsubscribe && this.unsubscribe();
   }
 
-  locationValueChange = (value, geo) => {
+  locationValueChange = (value, geo, place_id) => {
     let newFormData = this.state.formData;
     newFormData['location'] = geo;
     newFormData['address'] = value.description ? value.description : value;
+    newFormData['place_id'] = place_id;
 
     this.setState({
       formData: newFormData,
@@ -275,7 +277,7 @@ class EventEdit extends Component {
 
     // Validation
     for (const [key, value] of Object.entries(data)) {
-      if(!value && key !== 'notes' && key !== 'days') {
+      if(!value && key !== 'notes' && key !== 'days' && key !== 'place_id') {
         console.log('missing field: '+ key);
         return this.setState({errorMissing: true});
       }
@@ -286,7 +288,6 @@ class EventEdit extends Component {
 
     // recurring_end must be after start_date
     if(this.state.recurring === "yes" && data.recurring_end < data.start_time) {
-        console.log('recurring_end before start_time');
         alert('Last day must be later than First day');
         return this.setState({errorMissing: true});
     }
@@ -314,10 +315,8 @@ class EventEdit extends Component {
     this.props.firebase.calendar().add(eventData)
       .then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
-        this.props.history.push({
-          pathname: ROUTES.EVENTS,
-          state: { action: 'Event created successfully.' }
-        });
+        alert("Event added.");
+        this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
         alert("Error adding new event. Please reach out to support with these error details: " + error);
@@ -331,11 +330,8 @@ class EventEdit extends Component {
       .calendarDetails(this.props.match.params.id)
       .update(eventData)
       .then(() => {
-        console.log("Document updated");
-        this.props.history.push({
-          pathname: ROUTES.EVENTS,
-          state: { action: 'Event updated successfully.' }
-        });
+        alert("Event updated.");
+        this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
         alert("Error adding new event. Please reach out to support with these error details: " + error);
@@ -384,7 +380,7 @@ class EventEdit extends Component {
                           </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                          <LocationSearchInput defaultValue={defaultValue} valueChange={(value,geo) => {this.locationValueChange(value,geo)}} />
+                          <LocationSearchInput defaultValue={defaultValue} valueChange={(value,geo,placeId) => {this.locationValueChange(value,geo,placeId)}} />
                         </Grid>
                         {recurring === "no" &&
                         <Grid item xs={12} sm={12}>

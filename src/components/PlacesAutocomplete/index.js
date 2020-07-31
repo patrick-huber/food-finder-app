@@ -36,7 +36,10 @@ const useStyles = makeStyles((theme) => ({
 export default function GoogleMaps(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
+  // Todo: If geolocation coordinates are set manually then we should remove place_id.
+  // work on this once a map is embedded into the EditEvent page and it's easier to move a pin to select geolocation
   const [geoValue, setGeoValue] = React.useState(null);
+  const [placeId, setPlaceId] = React.useState(null);
   const [geoEdit, setGeoEdit] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
@@ -60,6 +63,7 @@ export default function GoogleMaps(props) {
 
     if(newValue) {
       setValue(newValue);
+      setPlaceId(newValue.place_id);
       // get geolocation and set form value
       if (!geocoder.current && window.google) {
         geocoder.current = new window.google.maps.Geocoder();
@@ -80,7 +84,7 @@ export default function GoogleMaps(props) {
   }
 
   React.useEffect(() => {
-    if(value && geoValue) props.valueChange(value, geoValue);
+    if(value && geoValue) props.valueChange(value, geoValue, placeId);
   },[value, geoValue]);
 
   React.useEffect(() => {

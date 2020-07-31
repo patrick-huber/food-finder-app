@@ -62,15 +62,6 @@ const NewEventButton = () => (
 function EventsPage(props) {
   const classes = useStyles();
 
-  if(props.location.state) {
-    if(props.location.state.action && props.location.state.action) {
-      alert(props.location.state.action);
-      props.history.push({
-        state: { action: null }
-      });
-    }
-  }
-
   return (
     <React.Fragment>
       <CssBaseline />
