@@ -607,10 +607,11 @@ class GMap extends Component {
               vendor_id: marker.vendor,
               vendor: vendor.name,
             });
+            const vendorArray = [markerData[vendorDoc.id]];
             this.setState({
               selected: marker,
               infoLoading: false,
-              infoData: markerData,
+              infoData: vendorArray,
             });
           }, err => {
             console.log('No such vendor!');
@@ -804,7 +805,7 @@ class GMap extends Component {
                         />
                       :
                         <InfoWindowVendor
-                          infoData={infoData[selected.vendor]}
+                          infoData={infoData[0]}
                           firebase={this.props.firebase}
                           onRender={(height) => { this.setPan(height) }}
                         />
