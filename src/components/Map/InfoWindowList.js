@@ -93,7 +93,7 @@ export default function InfoWindowList(props) {
       }
       {selected &&
         <div>
-          <IconButton color="inherit" onClick={() => {setSelected(null)}} aria-label="back to list of vendors">
+          <IconButton size="small" color="inherit" onClick={() => {setSelected(null)}} aria-label="back to list of vendors">
             <ArrowBackIcon />
           </IconButton>
           <InfoWindow
