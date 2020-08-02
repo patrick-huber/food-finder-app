@@ -265,6 +265,11 @@ class GMap extends Component {
         snapshot.forEach(event => {
           const eventData = event.data();
 
+          // Fix for null days array
+          if(eventData.days === null) {
+            eventData.days = [];
+          }
+
           if(eventData.recurring_start) {
             if(eventData.recurring_end.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
           } else if(eventData.end_time.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
