@@ -119,6 +119,7 @@ class EventEdit extends Component {
         days: [],
         notes: null,
         last_updated: today,
+        updated_by: this.props.authUser.email,
       },
       defaultValue: {
         address: null,
