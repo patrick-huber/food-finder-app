@@ -43,11 +43,12 @@ const Title = withStyles({
   },
 })(Typography);
 
-const Actions = withStyles({
+const Subtitle = withStyles({
   root: {
-    margin: '6px 0',
+    marginLeft: 4,
+    color: '#aaa',
   },
-})(Button);
+})(Typography);
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -61,7 +62,7 @@ export default function InfoWindowList(props) {
   const firebase = props.firebase;
 
   useEffect(() => {
-    let newHeight = observedList.current.clientHeight === 0 ? 150 : observedList.current.clientHeight;
+    let newHeight = observedList.current.clientHeight === 0 ? 200 : observedList.current.clientHeight;
     let offset = height ? -(newHeight - height) : newHeight;
 
     props.onRender(offset); 
@@ -75,6 +76,9 @@ export default function InfoWindowList(props) {
       <Title variant="h5" component="h2">
         Vendors at this location
       </Title>
+      <Subtitle color="text.secondary" variant="caption" component="h3">
+        {vendors[0].events[0].address}
+      </Subtitle>
 
       <List>
         {vendors.map((vendor, id) => (
