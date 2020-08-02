@@ -76,10 +76,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function InfoWindow(props) {
   const observed = useRef(null);
   const vendorData = props.infoData;
-  console.log(vendorData);
   const [modalOpen, setModalOpen] = useState(false);
   const firebase = props.firebase;
-  const websiteString = vendorData.info.website ? vendorData.info.website.slice(vendorData.info.website.search('//') + 2) : null;
 
   useEffect(() => {
     if(props.onRender) {
@@ -174,7 +172,7 @@ export default function InfoWindow(props) {
                 <CompactListItemIcon>
                   <LanguageIcon />
                 </CompactListItemIcon>
-                <ListItemText primary={websiteString} />
+                <ListItemText primary="Visit website" />
               </CompactListItem>
             }{vendorData.info.menu &&
               <CompactListItem alignItems={'flex-start'} key="menu" button onClick={() => openMenu(vendorData.info.menu)}>
