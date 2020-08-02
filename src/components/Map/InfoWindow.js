@@ -35,6 +35,7 @@ import InstagramIcon from '@material-ui/icons/Instagram';
 const Title = withStyles({
   root: {
     marginLeft: 4,
+    marginRight: 16, // For infowindow close
     textTransform: 'uppercase',
     fontWeight: 500,
     fontSize: '1.4rem',
