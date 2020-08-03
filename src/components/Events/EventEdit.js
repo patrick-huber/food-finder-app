@@ -499,7 +499,7 @@ class EventEdit extends Component {
                           </Grid>
                         }
                         <Grid item xs={12} sm={12}>
-                          <TextField fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
+                          <TextField value={formData.notes} fullWidth id="notes" label="Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
                         </Grid>
                       </Grid>
                       <div className={classes.submitWrapper}>
