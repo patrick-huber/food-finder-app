@@ -137,7 +137,6 @@ class SignUpFormBase extends Component {
       email,
       passwordOne,
       passwordTwo,
-      isAdmin,
       error,
       loading,
     } = this.state;

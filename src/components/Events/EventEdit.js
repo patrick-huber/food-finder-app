@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 
-import { Route } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 
-import { withAuthorization, withEmailVerification } from '../Session';
+import { withAuthorization } from '../Session';
 
 import Footer from '../Footer';
 import { Fullscreen } from '../Loading';
@@ -25,9 +24,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -354,7 +351,7 @@ class EventEdit extends Component {
   }
 
   render() {
-    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet, defaultValue } = this.state;
+    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, loading, formData, recurring, daysSet, defaultValue } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 

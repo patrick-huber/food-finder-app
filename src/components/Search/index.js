@@ -50,7 +50,6 @@ export default function VendorSearch(props) {
 
   return (
     <SearchAutocomplete
-    disableGutters
       id="search"
       PopperComponent={ResultsContainer}
       PaperComponent={ResultsContainer}

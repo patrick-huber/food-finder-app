@@ -1,36 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
-
-import { format, formatRelative, addDays } from 'date-fns';
+import React, { useEffect, useRef } from 'react';
 
 import { withStyles } from '@material-ui/core/styles';
 
 import { InfoWindow } from '../Map';
 
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import PhoneIcon from '@material-ui/icons/Phone';
-import LanguageIcon from '@material-ui/icons/Language';
-import RestaurantMenuIcon from '@material-ui/icons/RestaurantMenu';
-import ScheduleIcon from '@material-ui/icons/Schedule';
-import EventIcon from '@material-ui/icons/Event';
-
-import Dialog from '@material-ui/core/Dialog';
 import Container from '@material-ui/core/Container';
-import Toolbar from '@material-ui/core/Toolbar';
-import CloseIcon from '@material-ui/icons/Close';
-import Slide from '@material-ui/core/Slide';
-
-import FacebookIcon from '@material-ui/icons/Facebook';
-import InstagramIcon from '@material-ui/icons/Instagram';
 
 const Title = withStyles({
   root: {
@@ -49,10 +30,6 @@ const Subtitle = withStyles({
     color: '#aaa',
   },
 })(Typography);
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function InfoWindowList(props) {
   const observedList = useRef(null);

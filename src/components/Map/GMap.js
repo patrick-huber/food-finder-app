@@ -381,7 +381,6 @@ class GMap extends Component {
       let i = 0;
       const startDateFilter = new Date(dates[0].getTime());
       const endDateFilter = (!dates[1]) ? startDateFilter.addDays(1) : new Date(dates[1].getTime());
-      const filterDays = getDaysInRange(startDateFilter, endDateFilter);
 
       for (i; i < currentCalendar.length; i++) {
         if(currentCalendar[i].recurring_start) {

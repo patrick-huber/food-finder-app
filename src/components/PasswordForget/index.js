@@ -17,8 +17,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
-import Footer from '../Footer';
-
 const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   paper: {
