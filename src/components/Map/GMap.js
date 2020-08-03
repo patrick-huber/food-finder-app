@@ -197,10 +197,11 @@ function formatPhoneNumber(phoneNumberString) {
   return null
 }
 
+const screenHeight = window.innerHeight - headerHeight;
 const mapOptions = {
   mapContainerStyle : {
     top: headerHeight,
-    height: 'calc(100vh - ' + headerHeight + 'px)',
+    height: screenHeight,
     width: '100vw',
   },
   center: {
