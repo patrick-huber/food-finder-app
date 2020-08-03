@@ -299,7 +299,7 @@ class EventEdit extends Component {
     if(this.state.recurring === "no") {
       data.recurring_end = null;
       data.recurring_start = null;
-      data.days = null;
+      data.days = [];
     }
 
     if(this.state.newEvent) {
