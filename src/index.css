@@ -25,3 +25,15 @@ code {
 .gm-style-iw-d {
   overflow-x: hidden !important;
 }
+.gm-ui-hover-effect {
+  top: 4px !important;
+  right: 4px !important;
+  width: 30px !important;
+  height: 30px !important;
+}
+.gm-ui-hover-effect > img {
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 4px;
+}
