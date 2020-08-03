@@ -119,6 +119,7 @@ class EventEdit extends Component {
         days: [],
         notes: null,
         last_updated: today,
+        updated_by: this.props.authUser.email,
       },
       defaultValue: {
         address: null,
@@ -151,8 +152,6 @@ class EventEdit extends Component {
               formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : this.state.formData.recurring_end;
               formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : this.state.formData.last_updated;
               formData.location = location;
-
-          console.log("Document data:", doc.data());
 
           this.setState({
             newEvent: false,
@@ -315,7 +314,14 @@ class EventEdit extends Component {
     this.props.firebase.calendar().add(eventData)
       .then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
+        this.props.firebase.analytics.logEvent('event_add', {
+          user: this.props.authUser.email,
+          event: docRef.id,
+          vendor: this.props.authUser.vendor,
+        });
+
         alert("Event added.");
+
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
@@ -330,13 +336,21 @@ class EventEdit extends Component {
       .calendarDetails(this.props.match.params.id)
       .update(eventData)
       .then(() => {
+        this.props.firebase.analytics.logEvent('event_edit', {
+          user: this.props.authUser.email,
+          event: this.props.match.params.id,
+          vendor: this.props.authUser.vendor,
+        });
+        
         alert("Event updated.");
+
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
         alert("Error adding new event. Please reach out to support with these error details: " + error);
         this.setState({updatingFirestore: false});
       });
+
   }
 
   render() {

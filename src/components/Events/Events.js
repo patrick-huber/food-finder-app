@@ -207,8 +207,6 @@ class EventsList extends Component {
   }
 
   loadEvents = () => {
-    console.log('loadEvents')
-    console.log(this)
     this.unsubscribe = this.props.firebase
       .calendar()
       .where('vendor', '==', this.state.vendor)
@@ -259,6 +257,12 @@ class EventsList extends Component {
       .delete()
       .then(() => {
         console.log("Document deleted.");
+
+        this.props.firebase.analytics.logEvent('event_delete', {
+          user: this.props.authUser.email,
+          event: eventId,
+          vendor: this.props.authUser.vendor,
+        });
       })
       .catch((error) => {
         alert("Error deleting event. Please reach out to support with these error details: " + error);
