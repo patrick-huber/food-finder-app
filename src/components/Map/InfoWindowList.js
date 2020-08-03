@@ -76,7 +76,7 @@ export default function InfoWindowList(props) {
       <Title variant="h5" component="h2">
         Vendors at this location
       </Title>
-      <Subtitle color="text.secondary" variant="caption" component="h3">
+      <Subtitle variant="caption" component="h3">
         {vendors[0].events[0].address}
       </Subtitle>
 

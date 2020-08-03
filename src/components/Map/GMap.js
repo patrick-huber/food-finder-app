@@ -546,6 +546,7 @@ class GMap extends Component {
                     .then(vendorDoc => {
                       markerData[vendor].info = {
                         title: vendorDoc.data().name,
+                        description: vendorDoc.data().description,
                         phone: formatPhoneNumber(vendorDoc.data().phone),
                         website: vendorDoc.data().website,
                         menu: vendorDoc.data().menu,
@@ -581,6 +582,7 @@ class GMap extends Component {
             markerData[vendorDoc.id] = {};
             markerData[vendorDoc.id].info = {
               title: vendor.name,
+              description: vendor.description,
               phone: formatPhoneNumber(vendor.phone),
               website: vendor.website,
               menu: vendor.menu,

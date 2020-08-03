@@ -44,6 +44,14 @@ const Title = withStyles({
   },
 })(Typography);
 
+const Subtitle = withStyles({
+  root: {
+    marginLeft: 4,
+    color: '#aaa',
+    lineHeight: 1.2,
+  },
+})(Typography);
+
 const CompactListItem = withStyles({
   root: {
     padding: '2px 4px',
@@ -82,7 +90,7 @@ export default function InfoWindow(props) {
 
   useEffect(() => {
     if(props.onRender) {
-      props.onRender((observed.current.clientHeight === 0) ? 300 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
+      props.onRender((observed.current.clientHeight === 0) ? 350 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
     }    
   }, [observed]);
 
@@ -151,6 +159,11 @@ export default function InfoWindow(props) {
       <Title variant="h5" component="h2">
         {vendorData.info.title}
       </Title>
+      {vendorData.info.description &&
+        <Subtitle variant="caption" component="p">
+          {vendorData.info.description}
+        </Subtitle>
+      }
       <Grid container>
         <Grid item xs>
           <List>
