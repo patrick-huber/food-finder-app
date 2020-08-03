@@ -1,12 +1,8 @@
-import React, { Component, setState } from 'react';
+import React, { Component } from 'react';
 import { compose } from 'recompose';
 
-import * as ROLES from '../../constants/roles';
 import * as ROUTES from '../../constants/routes';
-import { AuthUserContext } from '../Session';
 import { withAuthorization } from '../Session';
-
-import EventList from './EventList';
 
 import { Spinner } from '../Loading';
 
@@ -145,25 +141,11 @@ function getDayString(dayValue) {
 
   return weekday[dayValue];
 }
-function convertDaysArrayToString(daysArray) {
-  let firstDay = true;
-  var daysString = '';
-
-  daysArray.map(day => {
-    if(firstDay) {
-      daysString += getDayString(day) + 's';
-      firstDay = false;
-    } else {
-      daysString += ', ' + getDayString(day) + 's';
-    }
-  });
-  return daysString;
-}
 function convertDaysValuesToStrings(daysArray) {
   var daysStringArray = [];
 
   daysArray.map(day => {
-    daysStringArray.push(getDayString(day));
+    return daysStringArray.push(getDayString(day));
   });
 
   return daysStringArray;
@@ -183,7 +165,6 @@ class EventsList extends Component {
   }
 
   componentDidMount() {
-    const vendor = this.props.authUser.vendor;
     this.setState({
       loading: true,
       vendor: this.props.authUser.vendor,
@@ -207,8 +188,6 @@ class EventsList extends Component {
   }
 
   loadEvents = () => {
-    console.log('loadEvents')
-    console.log(this)
     this.unsubscribe = this.props.firebase
       .calendar()
       .where('vendor', '==', this.state.vendor)
@@ -259,6 +238,12 @@ class EventsList extends Component {
       .delete()
       .then(() => {
         console.log("Document deleted.");
+
+        this.props.firebase.analytics.logEvent('event_delete', {
+          user: this.props.authUser.email,
+          event: eventId,
+          vendor: this.props.authUser.vendor,
+        });
       })
       .catch((error) => {
         alert("Error deleting event. Please reach out to support with these error details: " + error);
@@ -275,7 +260,7 @@ class EventsList extends Component {
   }
 
   render() {
-    const { text, events, tableData, loading } = this.state;
+    const { events, tableData, loading } = this.state;
     const { classes } = this.props;
     const columns = [
      {

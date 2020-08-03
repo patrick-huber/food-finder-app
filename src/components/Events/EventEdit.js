@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 
-import { Route } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 
-import { withAuthorization, withEmailVerification } from '../Session';
+import { withAuthorization } from '../Session';
 
 import Footer from '../Footer';
 import { Fullscreen } from '../Loading';
@@ -25,9 +24,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import EventIcon from '@material-ui/icons/Event';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -119,6 +116,7 @@ class EventEdit extends Component {
         days: [],
         notes: null,
         last_updated: today,
+        updated_by: this.props.authUser.email,
       },
       defaultValue: {
         address: null,
@@ -151,8 +149,6 @@ class EventEdit extends Component {
               formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : this.state.formData.recurring_end;
               formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : this.state.formData.last_updated;
               formData.location = location;
-
-          console.log("Document data:", doc.data());
 
           this.setState({
             newEvent: false,
@@ -315,7 +311,14 @@ class EventEdit extends Component {
     this.props.firebase.calendar().add(eventData)
       .then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
+        this.props.firebase.analytics.logEvent('event_add', {
+          user: this.props.authUser.email,
+          event: docRef.id,
+          vendor: this.props.authUser.vendor,
+        });
+
         alert("Event added.");
+
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
@@ -330,17 +333,25 @@ class EventEdit extends Component {
       .calendarDetails(this.props.match.params.id)
       .update(eventData)
       .then(() => {
+        this.props.firebase.analytics.logEvent('event_edit', {
+          user: this.props.authUser.email,
+          event: this.props.match.params.id,
+          vendor: this.props.authUser.vendor,
+        });
+        
         alert("Event updated.");
+
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
         alert("Error adding new event. Please reach out to support with these error details: " + error);
         this.setState({updatingFirestore: false});
       });
+
   }
 
   render() {
-    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, event, loading, formData, recurring, daysSet, defaultValue } = this.state;
+    const { newEvent, updatingFirestore, errorMissing, errorEndTime, errorEndTimeText, loading, formData, recurring, daysSet, defaultValue } = this.state;
     const { classes } = this.props;
     const headerText = newEvent ? 'New Event' : 'Edit Event';
 

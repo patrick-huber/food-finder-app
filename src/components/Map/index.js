@@ -1,4 +1,5 @@
 import GMap from './GMap';
+import InfoWindowList from './InfoWindowList';
 import InfoWindow from './InfoWindow';
 
-export { GMap, InfoWindow };
+export { GMap, InfoWindowList, InfoWindow };

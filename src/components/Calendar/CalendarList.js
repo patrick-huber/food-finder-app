@@ -13,8 +13,8 @@ export default function CalendarList(props) {
 
   return (
     <List>
-    {calendar.map((event) => (
-      <ListItem alignItems="flex-start" key={event.uid}>
+    {calendar.map((event, id) => (
+      <ListItem alignItems="flex-start" key={'list-'+id}>
         <ListItemIcon>
           <EventIcon color="primary" />
         </ListItemIcon>

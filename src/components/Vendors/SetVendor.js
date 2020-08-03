@@ -5,16 +5,8 @@ import * as ROUTES from '../../constants/routes';
 
 import { withAuthorization } from '../Session';
 
-import { withStyles } from "@material-ui/core/styles";
-
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-
-const styles = theme => ({
-  root: {
-    backgroundColor: "red"
-  },
-});
 
 class SetVendor extends Component {
   constructor(props) {
@@ -33,7 +25,6 @@ class SetVendor extends Component {
       .vendors()
       .onSnapshot(snapshot => {
         let vendors = [];
-        let selectedVendor = {};
 
         snapshot.forEach(vendor => {
           const vendorData = vendor.data();
@@ -76,7 +67,6 @@ class SetVendor extends Component {
 
   render() {
     const { loading, vendors, selectedVendor } = this.state;
-    const { classes } = this.props;
     const isAdmin = this.props.authUser.roles.ADMIN;
 
     return (
@@ -103,6 +93,5 @@ class SetVendor extends Component {
 const condition = authUser => !!authUser;
 
 export default compose(
-  withStyles(styles, { withTheme: true }),
   withAuthorization(condition),
 )(SetVendor);
