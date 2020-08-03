@@ -171,7 +171,10 @@ export default function InfoWindow(props) {
               <CompactListItemIcon>
                 <DirectionsIcon />
               </CompactListItemIcon>
-              <ListItemText primary={vendorData.events[0].address} />
+              <ListItemText
+                primary={vendorData.events[0].address}
+                secondary={vendorData.events[0].notes}
+              />
             </CompactListItem>
             {vendorData.info.phone &&
               <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => callPhone(vendorData.info.phone)}>
