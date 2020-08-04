@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
+import { format, formatRelative } from 'date-fns';
+
 import { withStyles } from '@material-ui/core/styles';
 
 import { InfoWindow } from '../Map';
@@ -66,6 +68,7 @@ export default function InfoWindowList(props) {
         >
           <ListItemText
             primary={vendor.info.title}
+            secondary={(vendor.events[0].isOpen ? 'Open now until ' + format(vendor.events[0].end_time.toDate(), 'p')   : ('Opens ' + formatRelative(vendor.events[0].start_time.toDate(), new Date()))) }
           />
         </ListItem>
         ))}

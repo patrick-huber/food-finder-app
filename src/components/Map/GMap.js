@@ -514,69 +514,58 @@ class GMap extends Component {
 
       // Check for multiple vendors at this location
       if(marker.place_id) {
-        const location = this.props.firebase
-          .calendar()
-          .where('place_id', '==', marker.place_id)
-          .onSnapshot(events => {
-            if(events.size) {
-              let vendorsArray = [];
+        let vendorsArray = [];
 
-              // Group events by vendor and add to vendor set
-              events.forEach(event => {
-                const eventData = event.data();
-                let updatedEvent = eventData;
-                markerData[eventData.vendor] = markerData[eventData.vendor] || { info: null, events: [] };
+        this.state.calendar.forEach(event => {
+          // Group events by vendor and add to vendor set
+          if(event.place_id === marker.place_id) {
+            let updatedEvent = event;
+            markerData[event.vendor] = markerData[event.vendor] || { info: null, events: [] };
 
-                // If eventData is recurring, need to calculate updated start_time to display correct order by date
-                if(eventData.recurring_start) {
-                  updatedEvent = getNextDate(eventData, this.props.firebase);
-                }
-
-                markerData[eventData.vendor].events.push(updatedEvent);
-              });
-
-              const vendorsLength = Object.keys(markerData).length;
-              const promise = (new Promise(() => {
-                Object.keys(markerData).forEach((vendor, index) => {
-                  // sort each vendor's events by start_time
-                  markerData[vendor].events.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
-
-                  // Set isOpen property for next event
-                  markerData[vendor].events[0]['isOpen'] = this.isOpen(markerData[vendor].events[0]);
-
-                  // Get vendor details
-                  this.props.firebase
-                    .vendor(vendor)
-                    .get()
-                    .then(vendorDoc => {
-                      markerData[vendor].info = {
-                        title: vendorDoc.data().name,
-                        description: vendorDoc.data().description,
-                        phone: formatPhoneNumber(vendorDoc.data().phone),
-                        website: vendorDoc.data().website,
-                        menu: vendorDoc.data().menu,
-                        photo: vendorDoc.data().photo,
-                        facebook: vendorDoc.data().facebook,
-                        instagram: vendorDoc.data().instagram,
-                      }
-                      vendorsArray.push(markerData[vendor]);
-                      if(vendorsLength-1 === index) {
-                        return this.setState({
-                          selected: marker,
-                          infoLoading: false,
-                          infoData: vendorsArray,
-                        });
-                      }
-                    });
-                });
-              }))
-
-            } else {
-              console.error('Unable to load details for place_id: ' + marker.place_id);
+            // If event is recurring, need to calculate updated start_time to display correct order by date
+            if(event.recurring_start) {
+              updatedEvent = getNextDate(event, this.props.firebase);
             }
-          }, err => {
-            console.error('No events at this place_id!');
+
+            markerData[event.vendor].events.push(updatedEvent);
+          }
+        });
+
+        const vendorsLength = Object.keys(markerData).length;
+        const promise = (new Promise(() => {
+          Object.keys(markerData).forEach((vendor, index) => {
+            // sort each vendor's events by start_time
+            markerData[vendor].events.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
+
+            // Set isOpen property for next event
+            markerData[vendor].events[0]['isOpen'] = this.isOpen(markerData[vendor].events[0]);
+
+            // Get vendor details
+            this.props.firebase
+              .vendor(vendor)
+              .get()
+              .then(vendorDoc => {
+                markerData[vendor].info = {
+                  title: vendorDoc.data().name,
+                  description: vendorDoc.data().description,
+                  phone: formatPhoneNumber(vendorDoc.data().phone),
+                  website: vendorDoc.data().website,
+                  menu: vendorDoc.data().menu,
+                  photo: vendorDoc.data().photo,
+                  facebook: vendorDoc.data().facebook,
+                  instagram: vendorDoc.data().instagram,
+                }
+                vendorsArray.push(markerData[vendor]);
+                if(vendorsLength-1 === index) {
+                  return this.setState({
+                    selected: marker,
+                    infoLoading: false,
+                    infoData: vendorsArray,
+                  });
+                }
+              });
           });
+        }));
       } else {
         // Fallback to lookup all events using getCalendarEventsAtLocation
         const vendor = this.props.firebase
