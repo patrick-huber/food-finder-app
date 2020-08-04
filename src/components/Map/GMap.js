@@ -405,6 +405,18 @@ class GMap extends Component {
               dateResults.push(currentCalendar[i]);
             }
           }
+        } else {
+          // One time event
+          // Check if event date is within filter dates
+          const nextDateOverlap = isWithinInterval(
+            currentCalendar[i].start_time.toDate(),
+            { start: startDateFilter, end: endDateFilter }
+          );
+
+          if(nextDateOverlap) {
+            // event is within date range. Push to result
+            dateResults.push(currentCalendar[i]);
+          }
         }
       }
     } else {
