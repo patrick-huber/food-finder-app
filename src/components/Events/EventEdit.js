@@ -149,6 +149,8 @@ class EventEdit extends Component {
               formData.recurring_end = doc.data().recurring_end ? addDays(doc.data().recurring_end.toDate(), -1) : this.state.formData.recurring_end;
               formData.last_updated = doc.data().last_updated ? doc.data().last_updated.toDate() : this.state.formData.last_updated;
               formData.location = location;
+              formData.place_id = doc.data().place_id;
+              formData.notes = doc.data().notes;
 
           this.setState({
             newEvent: false,
