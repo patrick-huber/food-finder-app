@@ -44,9 +44,6 @@ import Container from '@material-ui/core/Container';
 import LocationSearchInput from '../PlacesAutocomplete';
 
 const styles = theme => ({
-  root: {
-    backgroundColor: "red"
-  },
   appBarSpacer: theme.mixins.toolbar,
   cardGrid: {
     paddingTop: theme.spacing(8),
