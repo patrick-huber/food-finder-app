@@ -170,10 +170,6 @@ class EventEdit extends Component {
       });
   }
 
-  componentWillUnmount() {
-    this.unsubscribe && this.unsubscribe();
-  }
-
   locationValueChange = (value, geo, place_id) => {
     let newFormData = this.state.formData;
     newFormData['location'] = geo;
@@ -343,7 +339,7 @@ class EventEdit extends Component {
         this.props.history.push(ROUTES.EVENTS);
       })
       .catch((error) => {
-        alert("Error adding new event. Please reach out to support with these error details: " + error);
+        alert("Error updating event. Please reach out to support with these error details: " + error);
         this.setState({updatingFirestore: false});
       });
 
@@ -498,7 +494,7 @@ class EventEdit extends Component {
                           </Grid>
                         }
                         <Grid item xs={12} sm={12}>
-                          <TextField value={formData.notes} helperText="(Ex: Behind Joe's Hardware in the back lot. Open until sold out.)" fullWidth id="notes" label="Location Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
+                          <TextField value={formData.notes} InputLabelProps={{ shrink: formData.notes }} helperText="(Ex: Behind Joe's Hardware in the back lot. Open until sold out.)" fullWidth id="notes" label="Location Notes" variant="outlined" onChange={(value) => {this.handleNotesChange(value)}} />
                         </Grid>
                       </Grid>
                       <div className={classes.submitWrapper}>
