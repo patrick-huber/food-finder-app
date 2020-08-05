@@ -87,12 +87,23 @@ export default function InfoWindow(props) {
   const vendorData = props.infoData;
   const [modalOpen, setModalOpen] = useState(false);
   const firebase = props.firebase;
+  const [photo, setPhoto] = useState(null);
+
+  if(vendorData.info.photo) {
+    firebase.getVendorPhoto(vendorData.info.photo).getDownloadURL().then((url) => {
+      setPhoto(url);
+    });
+  }
 
   useEffect(() => {
     if(props.onRender) {
       props.onRender((observed.current.clientHeight === 0) ? 350 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
     }    
   }, [observed]);
+
+  function getURL() {
+    return firebase.getVendorPhotoURL(vendorData.info.photo);
+  }
 
   function openDirections(location) {
     firebase.analytics.logEvent('get_directions', {
@@ -237,10 +248,10 @@ export default function InfoWindow(props) {
             </CompactListItem>
           </List>
         </Grid>
-        {(vendorData.info.photo || vendorData.info.instagram || vendorData.info.facebook) &&
+        {(photo || vendorData.info.instagram || vendorData.info.facebook) &&
           <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
-            {vendorData.info.photo &&
-              <img src={vendorData.info.photo} alt="Vendor" style={{width:'100%'}} />
+            {photo &&
+              <img src={photo} alt="Vendor" style={{width:'100%'}} />
             }
             <Grid container justify="space-evenly" spacing={1}>
               {vendorData.info.instagram &&
