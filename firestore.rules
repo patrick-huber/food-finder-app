@@ -20,8 +20,8 @@ service cloud.firestore {
 
     match /vendors/{vendorId} {
       allow get, list;
-      allow create, delete: if isAdmin();
-      allow update: if signedIn() && request.auth.vendor == vendorId;
+      allow create, update, delete: if isAdmin();
+      allow update: if signedIn() && vendorId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.vendor;
     }
 
     match /calendar/{eventId} {
