@@ -24,7 +24,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import InfoIcon from '@material-ui/icons/Info';
+import StorefrontIcon from '@material-ui/icons/Storefront';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -114,6 +114,12 @@ class VendorEdit extends Component {
 
   componentDidMount() {
     if(this.props.match.path === ROUTES.VENDOR_NEW) return;
+
+    // check if user is authenticated to edit this vendor
+    if(this.props.match.params.id !== this.props.authUser.vendor && this.props.authUser.roles.ADMIN !== 'ADMIN') {
+      alert('You are no authorized to edit this vendor.');
+      this.props.history.push(ROUTES.EVENTS);
+    }
 
     this.setState({ loading: true });
 
@@ -269,7 +275,7 @@ class VendorEdit extends Component {
                 <CssBaseline />
                 <div className={classes.paper}>
                   <Avatar className={classes.avatar}>
-                    <InfoIcon />
+                    <StorefrontIcon />
                   </Avatar>
                   <Typography component="h1" variant="h5">
                     {headerText}
