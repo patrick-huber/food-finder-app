@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/storage';
 import 'firebase/firestore';
 import 'firebase/analytics';
 
@@ -27,6 +28,8 @@ class Firebase {
 
     this.auth = app.auth();
     this.db = app.firestore();
+    this.storage = app.storage();
+    this.storageRef = this.storage.ref();
     this.firestore = app.firestore;
     this.analytics = app.analytics();
 
@@ -114,6 +117,10 @@ class Firebase {
   calendarDetails = uid => this.db.doc(`calendar/${uid}`);
 
   calendar = () => this.db.collection('calendar');
+
+  // *** Storage API ***
+
+  getVendorPhoto = filename => this.storageRef.child(`vendor-photos/${filename}`);
 }
 
 export default Firebase;
