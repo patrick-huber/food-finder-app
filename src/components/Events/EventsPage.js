@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { compose } from 'recompose';
 
 import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
 
 import { withAuthorization } from '../Session';
 import { EventList } from '../Events';
@@ -12,10 +13,12 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import EventIcon from '@material-ui/icons/Event';
 import StorefrontIcon from '@material-ui/icons/Storefront';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 
 const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -80,6 +83,11 @@ function EventsPage(props) {
               {vendor.name} 
             </Typography>
           }
+          {vendor && props.authUser.roles[ROLES.ADMIN] &&
+            <Typography component="p" variant="p" align="center" gutterBottom>
+              New User link: <Link href={'https://foodfinder.app/signup?vendor='+vendor.uid} target="_blank">{'https://foodfinder.app/signup?vendor='+vendor.uid}</Link> 
+            </Typography>
+          }
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">
               <Grid item>
@@ -98,6 +106,16 @@ function EventsPage(props) {
                   Edit Food Stand
                 </Button>
               </Grid>
+              {props.authUser.roles[ROLES.ADMIN] &&
+                <Grid item>
+                  <Button variant="outlined" color="secondary"
+                    onClick={() => { props.history.push(ROUTES.VENDOR_NEW) }}
+                    startIcon={<StorefrontIcon />}
+                  >
+                    New Food Stand
+                  </Button>
+                </Grid>
+              }
             </Grid>
           </div>
           <EventList authUser={props.authUser} {...props} />
