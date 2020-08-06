@@ -223,9 +223,20 @@ class VendorEdit extends Component {
           vendor: docRef.id,
         });
 
-        alert("Food stand added.");
-
-        this.props.history.push(ROUTES.EVENTS);
+        // Switch new vendor to active vendor for user
+        this.props.firebase
+          .user(this.props.authUser.uid)
+          .update({
+            vendor: docRef.id,
+          })
+          .then(() => {
+            alert("Food stand added.");
+            this.props.history.push(ROUTES.EVENTS);
+            window.location.reload(true);
+          })
+          .catch((error) => {
+            alert("Error updating user. Error details: " + error);
+          });
       })
       .catch((error) => {
         alert("Error adding new vendor. Please reach out to support with these error details: " + error);

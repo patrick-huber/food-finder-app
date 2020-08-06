@@ -42,17 +42,18 @@ function EventsPage(props) {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [vendorName, setVendorName] = useState('');
+  const [vendor, setVendor] = useState(null);
 
   useEffect(() => {
-    if(!loading && !loaded) {
-      setLoaded(true);
+    if((!loading && !loaded) || (vendor && props.authUser.vendor !== vendor.uid)) {
+      console.log('loading name')
+      setLoading(true);
       props.firebase
         .vendor(props.authUser.vendor)
         .get()
         .then((doc) => {
           if (doc.exists) {
-            setVendorName(doc.data().name);
+            setVendor({ ...doc.data(), uid: doc.id });
           } else {
             // doc.data() will be undefined in this case
             console.log("No such vendor!");
@@ -63,7 +64,7 @@ function EventsPage(props) {
           console.log("Error getting vendor name:", error);
         });
     }    
-  });
+  }, [props]);
 
   return (
     <React.Fragment>
@@ -74,9 +75,11 @@ function EventsPage(props) {
           <Typography component="h1" variant="h3" align="center" color="textPrimary">
             Manage Events
           </Typography>
-          <Typography component="h2" variant="h5" align="center" gutterBottom>
-            {vendorName} 
-          </Typography>
+          {vendor &&
+            <Typography component="h2" variant="h5" align="center" gutterBottom>
+              {vendor.name} 
+            </Typography>
+          }
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">
               <Grid item>
