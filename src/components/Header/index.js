@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
   mapIcon: {
-    color: theme.palette.secondary.main,
+    color: theme.palette.error.main,
   },
 }));
 
@@ -127,6 +127,24 @@ export default function Header() {
               <ListItemText primary="Manage Events" />
             </ListItem>
           </Link>
+          <Link className={clsx(classes.menuLink)} to={'/vendor/edit/' + authUser.vendor}>
+            <ListItem
+              button
+            >
+              <ListItemIcon></ListItemIcon>
+              <ListItemText primary="Edit Food Stand" />
+            </ListItem>
+          </Link>
+          {!!authUser.roles[ROLES.ADMIN] && (
+            <Link className={clsx(classes.menuLink)} to={ROUTES.VENDOR_NEW}>
+              <ListItem
+                button
+              >
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary="New Food Stand" />
+              </ListItem>
+            </Link>
+          )}
           <Link className={clsx(classes.menuLink)} to={ROUTES.ACCOUNT}>
             <ListItem
               button

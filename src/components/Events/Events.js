@@ -29,14 +29,12 @@ import Link from '@material-ui/core/Link';
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme => ({
-  root: {
-    backgroundColor: "red"
-  },
-  dataTable: {
-    // backgroundColor: theme.palette.primary.light,
-  },
   daysChip: {
     margin: 2,
+  },
+  deleteButton: {
+    color: theme.palette.error.main,
+    borderColor: theme.palette.error.main,
   },
   centerText: {
     textAlign: 'center',
@@ -66,6 +64,8 @@ class ActionsMenu extends Component {
 
   render() {
     const { anchorEl, index } = this.state;
+    const { classes } = this.props;
+
     return (
       <div>
         <Hidden xsDown>
@@ -113,9 +113,9 @@ class ActionsMenu extends Component {
             </Grid>
             <Grid item xs={6}>
               <Button
+                className={classes.deleteButton}
                 variant="outlined"
                 fullWidth
-                color="secondary"
                 startIcon={<DeleteIcon />}
                 onClick={() => {this.handleClose('Delete')}}
               >
@@ -321,7 +321,7 @@ class EventsList extends Component {
         empty: true,
         customBodyRenderLite: (dataIndex, rowIndex) => {
           return (
-            <ActionsMenu index={dataIndex} selectAction={(rowIndex, action) => {this.onActionSelect(tableData[dataIndex].uid, action)}} />
+            <ActionsMenu index={dataIndex} selectAction={(rowIndex, action) => {this.onActionSelect(tableData[dataIndex].uid, action)}} {...this.props} />
           )
         }
       }

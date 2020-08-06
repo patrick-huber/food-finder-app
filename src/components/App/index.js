@@ -8,7 +8,7 @@ import Page from '../PageView';
 import Header from '../Header';
 import LandingPage from '../Landing';
 import AboutPage from '../About';
-import { VendorPage } from '../Vendors';
+import { VendorEdit } from '../Vendors';
 import { EventsPage, EventEdit } from '../Events';
 import SupportPage from '../Support';
 import SignUpPage from '../SignUp';
@@ -29,8 +29,12 @@ const theme = createMuiTheme({
       contrastText: '#ffffff',
     },
     secondary: {
+      main: '#12ceaf',
+      contrastText: '#ffffff',
+    },
+    error: {
       main: '#FF0A58',
-      contrastText: '#ffffff'
+      contrastText: '#ffffff',
     }
   },
 });
@@ -54,14 +58,6 @@ function App (props) {
           render={() => (
             <Page title={ROUTE_TITLES.ABOUT} firebase={props.firebase} >
               <AboutPage />
-            </Page>
-          )}
-        />
-        <Route
-          path={ROUTES.VENDORS}
-          render={() => (
-            <Page title={ROUTE_TITLES.VENDORS} firebase={props.firebase} >
-              <VendorPage />
             </Page>
           )}
         />
@@ -96,6 +92,23 @@ function App (props) {
           render={() => (
             <Page title={ROUTE_TITLES.EVENT_NEW} firebase={props.firebase} >
               <EventEdit />
+            </Page>
+          )}
+        />
+        <Route
+          path={ROUTES.VENDOR_EDIT}
+          render={() => (
+            <Page title={ROUTE_TITLES.VENDOR_EDIT} firebase={props.firebase} >
+              <VendorEdit />
+            </Page>
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.VENDOR_NEW}
+          render={() => (
+            <Page title={ROUTE_TITLES.VENDOR_NEW} firebase={props.firebase} >
+              <VendorEdit />
             </Page>
           )}
         />

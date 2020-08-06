@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { compose } from 'recompose';
 
-import { Route } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 
 import { withAuthorization } from '../Session';
@@ -15,6 +14,8 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import EventIcon from '@material-ui/icons/Event';
+import StorefrontIcon from '@material-ui/icons/Storefront';
 
 const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -37,19 +38,33 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const NewEventButton = () => (
-  <Route render={({ history}) => (
-    <Button variant="contained" color="primary"
-      onClick={() => { history.push(ROUTES.EVENT_NEW) }}
-    >
-      Add New Event
-    </Button>
-  )} />
-)
-
-
 function EventsPage(props) {
   const classes = useStyles();
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [vendor, setVendor] = useState(null);
+
+  useEffect(() => {
+    if((!loading && !loaded) || (vendor && props.authUser.vendor !== vendor.uid)) {
+      console.log('loading name')
+      setLoading(true);
+      props.firebase
+        .vendor(props.authUser.vendor)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            setVendor({ ...doc.data(), uid: doc.id });
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such vendor!");
+          }
+          setLoaded(true);
+          setLoading(false);
+        }).catch(function(error) {
+          console.log("Error getting vendor name:", error);
+        });
+    }    
+  }, [props]);
 
   return (
     <React.Fragment>
@@ -57,13 +72,31 @@ function EventsPage(props) {
       <div className={classes.appBarSpacer} />
       <main>
         <Container className={classes.section} maxWidth="md">
-          <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-            {props.authUser.vendor} Events
+          <Typography component="h1" variant="h3" align="center" color="textPrimary">
+            Manage Events
           </Typography>
+          {vendor &&
+            <Typography component="h2" variant="h5" align="center" gutterBottom>
+              {vendor.name} 
+            </Typography>
+          }
           <div className={classes.buttonGroup}>
             <Grid container spacing={2} justify="center">
               <Grid item>
-                <NewEventButton />
+                <Button variant="contained" color="primary"
+                  onClick={() => { props.history.push(ROUTES.EVENT_NEW) }}
+                  startIcon={<EventIcon />}
+                >
+                  Add New Event
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="contained" color="secondary"
+                  onClick={() => { props.history.push('/vendor/edit/' + props.authUser.vendor) }}
+                  startIcon={<StorefrontIcon />}
+                >
+                  Edit Food Stand
+                </Button>
               </Grid>
             </Grid>
           </div>
