@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
   mapIcon: {
-    color: theme.palette.secondary.main,
+    color: theme.palette.error.main,
   },
 }));
 

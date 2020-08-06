@@ -54,7 +54,7 @@ const styles = theme => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -361,7 +361,6 @@ class VendorEdit extends Component {
                       disabled={updatingFirestore}
                       fullWidth
                       variant="outlined"
-                      color="secondary"
                       className={classes.submit}
                       onClick={() => { this.props.history.goBack() }}
                     >

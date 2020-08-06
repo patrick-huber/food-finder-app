@@ -516,7 +516,6 @@ class EventEdit extends Component {
                         disabled={updatingFirestore}
                         fullWidth
                         variant="outlined"
-                        color="secondary"
                         className={classes.submit}
                         onClick={() => { this.props.history.goBack() }}
                       >
