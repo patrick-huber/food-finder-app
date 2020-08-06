@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { compose } from 'recompose';
 
 import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
 
 import { withAuthorization } from '../Session';
 
@@ -116,7 +117,7 @@ class VendorEdit extends Component {
     if(this.props.match.path === ROUTES.VENDOR_NEW) return;
 
     // check if user is authenticated to edit this vendor
-    if(this.props.match.params.id !== this.props.authUser.vendor && this.props.authUser.roles.ADMIN !== 'ADMIN') {
+    if(this.props.match.params.id !== this.props.authUser.vendor && !this.props.authUser.roles[ROLES.ADMIN]) {
       alert('You are no authorized to edit this vendor.');
       this.props.history.push(ROUTES.EVENTS);
     }
@@ -222,7 +223,7 @@ class VendorEdit extends Component {
           vendor: docRef.id,
         });
 
-        alert("Vendor added.");
+        alert("Food stand added.");
 
         this.props.history.push(ROUTES.EVENTS);
       })
@@ -243,7 +244,7 @@ class VendorEdit extends Component {
           vendor: this.props.match.params.id,
         });
         
-        alert("Vendor info updated.");
+        alert("Food stand updated.");
 
         this.props.history.push(ROUTES.EVENTS);
       })
@@ -257,7 +258,7 @@ class VendorEdit extends Component {
   render() {
     const { newVendor, updatingFirestore, errorText, errorMissing, errorWebsite, errorMenu, loading, formData, paymentOptionsSet } = this.state;
     const { classes } = this.props;
-    const headerText = newVendor ? 'New Vendor' : 'Edit Vendor Info';
+    const headerText = newVendor ? 'New Food Stand' : 'Edit Food Stand';
 
     return (
       <React.Fragment>
@@ -353,7 +354,7 @@ class VendorEdit extends Component {
                         className={classes.submit}
                         onClick={(event) => {this.submitForm(event)}}
                       >
-                        {newVendor ? 'Create Vendor': 'Edit Vendor Info'}
+                        {newVendor ? 'Create Food Stand': 'Edit Food Stand'}
                       </Button>
                       {updatingFirestore && <CircularProgress size={24} className={classes.buttonProgress} />}
                     </div>
