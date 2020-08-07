@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'recompose';
+
+import qs from 'qs';
 
 import { areIntervalsOverlapping, isWithinInterval } from 'date-fns';
 
@@ -283,11 +287,24 @@ class GMap extends Component {
         });
 
         if(this.state.loading) {
-          this.setNewBounds(calendar);
+          // URL params to show specific vendor or place
+          const urlProps = qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
+          
           this.setState({
             calendar,
             fullCalendar: calendar,
             loading: false,
+          },() => {
+            if(urlProps.vendor || urlProps.place) {
+              if(urlProps.vendor) {
+                this.setSelectedVendor({uid: urlProps.vendor, name: urlProps.vendor});
+              }
+              if(urlProps.place) {
+                this.setSelected({place_id: urlProps.place});
+              }
+            } else {
+              this.setNewBounds(calendar);
+            }
           });
         } else {
           this.setState({
@@ -371,6 +388,7 @@ class GMap extends Component {
         }
       } else {
         alert('This vendor does not have any active events.');
+        this.setNewBounds(this.state.calendar);
       }
     }
 
@@ -575,6 +593,11 @@ class GMap extends Component {
                 }
                 vendorsArray.push(markerData[vendor]);
                 if(vendorsLength-1 === index) {
+                  if(!marker.location) {
+                    // Set latitude & longitude if marker doesn't have location (place set from URL param)
+                    marker.location = vendorsArray[0].events[0].location;
+                  }
+
                   return this.setState({
                     selected: marker,
                     infoLoading: false,
@@ -965,4 +988,8 @@ class GMap extends Component {
   }
 }
 
-export default withFirebase(GMap);
+export default compose(
+  withRouter,
+  withFirebase,
+)(GMap);
+
