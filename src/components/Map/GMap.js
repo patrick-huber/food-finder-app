@@ -133,46 +133,52 @@ function getNextDate(recurringEvent, firebase, fromDate) {
   let recurringEventDays = '';
   let firstDay = true;
   const today = fromDate || new Date();
-  const todayDay = today.getDay();
   const startDate = recurringEvent.start_time.toDate();
-  const startHour = startDate.getHours();
-  const startMinutes = startDate.getMinutes();
-  const endDate = recurringEvent.end_time.toDate();
-  const endHour = endDate.getHours();
-  const endMinutes = endDate.getMinutes();
-  let newStart = new Date(today);
-  let newEnd = new Date(today);
-  let checkDay = todayDay;
-  let dateSet = false;
 
-  // Set start_time and end_time of next recurring event (closest to today)
-  // Go through event days array starting at index of todayDay
-  do {
-    let eventDay = (recurringEvent.days.indexOf(checkDay) !== -1) ? recurringEvent.days[recurringEvent.days.indexOf(checkDay)] : null;
+  // Check if start_time is in the future. If in the future no need to calculate since next start time is recurringEvent.start_time
+  if(startDate < today) {
+    // Set start_time and end_time of next recurring event (closest to today)
+    const todayDay = today.getDay();
+    const startHour = startDate.getHours();
+    const startMinutes = startDate.getMinutes();
+    const endDate = recurringEvent.end_time.toDate();
+    const endHour = endDate.getHours();
+    const endMinutes = endDate.getMinutes();
+    let newStart = new Date(today);
+    let newEnd = new Date(today);
+    let checkDay = todayDay;
+    let dateSet = false;
 
-    if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
-      // Happening today and hasn't ended yet - keep newStart and newEnd value of today
-      dateSet = true;
-    } else if(todayDay < eventDay) {
-      // If recurring day is greater than today, add days for new event dates
-      newStart = newStart.addDays(eventDay - todayDay)
-      newEnd = newEnd.addDays(eventDay - todayDay);
-      dateSet = true;
+    // Go through event days array starting at index of todayDay
+    do {
+      let eventDay = (recurringEvent.days.indexOf(checkDay) !== -1) ? recurringEvent.days[recurringEvent.days.indexOf(checkDay)] : null;
+
+      if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
+        // Happening today and hasn't ended yet - keep newStart and newEnd value of today
+        dateSet = true;
+      } else if(todayDay < eventDay) {
+        // If recurring day is greater than today, add days for new event dates
+        newStart = newStart.addDays(eventDay - todayDay)
+        newEnd = newEnd.addDays(eventDay - todayDay);
+        dateSet = true;
+      }
+      checkDay++;
+    } while(checkDay < 7 && !dateSet);
+    if(!dateSet) {
+      // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
+      newStart = newStart.addDays(7 - todayDay + recurringEvent.days[0]); // First recurring day in array is next event day
+      newEnd = newEnd.addDays(7 - todayDay + recurringEvent.days[0]);
     }
-    checkDay++;
-  } while(checkDay < 7 && !dateSet);
-  if(!dateSet) {
-    // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
-    newStart = newStart.addDays(7 - todayDay + recurringEvent.days[0]); // First recurring day in array is next event day
-    newEnd = newEnd.addDays(7 - todayDay + recurringEvent.days[0]);
+
+    newStart.setHours(startHour);
+    newStart.setMinutes(startMinutes);
+    recurringEvent.start_time = new firebase.firestore.Timestamp.fromDate(newStart);
+    newEnd.setHours(endHour);
+    newEnd.setMinutes(endMinutes);
+    recurringEvent.end_time = new firebase.firestore.Timestamp.fromDate(newEnd);
   }
 
-  newStart.setHours(startHour);
-  newStart.setMinutes(startMinutes);
-  recurringEvent.start_time = new firebase.firestore.Timestamp.fromDate(newStart);
-  newEnd.setHours(endHour);
-  newEnd.setMinutes(endMinutes);
-  recurringEvent.end_time = new firebase.firestore.Timestamp.fromDate(newEnd);
+  
 
   // Create plain text recurring days string
   recurringEvent.days.map(day => {
